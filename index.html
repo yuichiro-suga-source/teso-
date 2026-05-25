@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<!-- スマホ幅に最適化。LINE内ブラウザでも崩れないようviewport指定 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>金運手相でわかる！あなたの節電タイプ診断</title>
+
+<!-- 占い感を少しだけ出すための明朝（見出し）と、親しみやすい丸ゴシック（本文） -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  /* =========================================================
+     カラーテーマ：白・ゴールド・薄いグリーン
+     清潔感を最優先。怪しくならないよう彩度は抑えめ。
+     ========================================================= */
+  :root{
+    --bg:        #fbfaf6;   /* ほんのり温かい白 */
+    --card:      #ffffff;
+    --ink:       #3a3a34;   /* 文字色（真っ黒は避けて柔らかく） */
+    --ink-soft:  #7a7a70;   /* 補足文の薄い文字 */
+    --gold:      #c8a24b;   /* ゴールド（アクセント） */
+    --gold-deep: #a8842f;
+    --gold-pale: #f4ecd6;   /* 薄ゴールド背景 */
+    --green:     #6fa56b;   /* 薄いグリーン（安心感） */
+    --green-pale:#e9f1e6;
+    --line:      #ece6d6;   /* 区切り線 */
+    --shadow:    0 10px 30px rgba(160,140,80,.12);
+    --shadow-sm: 0 4px 14px rgba(160,140,80,.10);
+    --radius:    22px;      /* 角丸：やわらかく */
+  }
+
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  html,body{ margin:0; padding:0; }
+
+  body{
+    font-family:"Zen Maru Gothic", system-ui, sans-serif;
+    color:var(--ink);
+    background:var(--bg);
+    /* 手相らしい、ごくうっすらした線模様の背景で雰囲気づくり */
+    background-image:
+      radial-gradient(circle at 20% 0%, rgba(200,162,75,.05), transparent 45%),
+      radial-gradient(circle at 90% 20%, rgba(111,165,107,.06), transparent 40%);
+    line-height:1.85;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* スマホファースト：中央寄せの1カラム。最大幅で大画面でも崩れない */
+  .wrap{
+    max-width:480px;
+    margin:0 auto;
+    padding:0 18px 40px;
+    min-height:100vh;
+  }
+
+  /* 画面の切り替え：表示中の画面だけ .active を付ける */
+  .screen{ display:none; animation:fadeIn .5s ease both; }
+  .screen.active{ display:block; }
+  @keyframes fadeIn{ from{ opacity:0; transform:translateY(10px);} to{ opacity:1; transform:translateY(0);} }
+
+  /* ---- 共通：ヘッダーの小さなブランドマーク ---- */
+  .brand{
+    text-align:center;
+    padding:26px 0 6px;
+    font-size:12px;
+    letter-spacing:.18em;
+    color:var(--gold-deep);
+    font-weight:700;
+  }
+  .brand .palm{ font-size:22px; display:block; margin-bottom:2px; }
+
+  /* ---- カード ---- */
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:30px 24px;
+    margin-top:18px;
+    border:1px solid rgba(200,162,75,.12);
+  }
+
+  /* ---- 見出し ---- */
+  h1{
+    font-family:"Shippori Mincho", serif;
+    font-size:25px;
+    line-height:1.55;
+    margin:6px 0 2px;
+    text-align:center;
+    letter-spacing:.01em;
+  }
+  h1 .accent{ color:var(--gold-deep); }
+
+  .lead{
+    text-align:center;
+    font-size:15px;
+    color:var(--ink);
+    margin:14px 4px 0;
+  }
+
+  /* ---- エンタメ注記（一番大事：断定しないことを明示） ---- */
+  .note{
+    background:var(--green-pale);
+    color:#5c7a58;
+    font-size:12.5px;
+    line-height:1.7;
+    border-radius:14px;
+    padding:12px 16px;
+    margin-top:20px;
+    text-align:center;
+  }
+
+  /* ---- ボタン ---- */
+  .btn{
+    display:block;
+    width:100%;
+    border:none;
+    cursor:pointer;
+    font-family:inherit;
+    font-weight:700;
+    font-size:16.5px;
+    padding:18px 20px;          /* 大きく押しやすく */
+    border-radius:16px;
+    margin-top:16px;
+    transition:transform .12s ease, box-shadow .2s ease, opacity .2s;
+  }
+  .btn:active{ transform:scale(.98); }
+
+  /* メインのゴールドボタン */
+  .btn-primary{
+    background:linear-gradient(135deg, #d9b45f, var(--gold) 60%, var(--gold-deep));
+    color:#fff;
+    box-shadow:0 8px 20px rgba(168,132,47,.28);
+  }
+  /* サブのグリーンボタン */
+  .btn-green{
+    background:var(--green);
+    color:#fff;
+    box-shadow:0 8px 18px rgba(111,165,107,.26);
+  }
+  /* 枠線だけの控えめボタン */
+  .btn-ghost{
+    background:#fff;
+    color:var(--gold-deep);
+    border:1.5px solid var(--gold);
+  }
+
+  /* ---- 撮影アイコン（手のひら）---- */
+  .palm-icon{
+    width:96px; height:96px;
+    margin:4px auto 10px;
+    display:block;
+  }
+
+  /* ---- アップロード案内 ---- */
+  .upload-hint{
+    text-align:center;
+    font-size:14.5px;
+    color:var(--ink);
+    margin:6px 4px 4px;
+  }
+
+  /* 画像プレビュー枠 */
+  .preview-box{
+    margin-top:18px;
+    border-radius:18px;
+    overflow:hidden;
+    background:var(--gold-pale);
+    border:2px dashed rgba(200,162,75,.45);
+    min-height:200px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:13px;
+    position:relative;
+  }
+  .preview-box img{
+    width:100%;
+    display:block;
+  }
+  .preview-placeholder{ padding:40px 20px; }
+  .preview-placeholder .big{ font-size:34px; display:block; margin-bottom:8px; }
+
+  /* ファイル入力は隠して、ラベルをボタン化 */
+  #fileInput{ display:none; }
+
+  /* ---- 診断中画面 ---- */
+  .loading-wrap{
+    text-align:center;
+    padding:60px 0 40px;
+  }
+  /* くるくる回るゴールドのリング */
+  .spinner{
+    width:90px; height:90px;
+    margin:0 auto 28px;
+    border-radius:50%;
+    border:5px solid var(--gold-pale);
+    border-top-color:var(--gold);
+    animation:spin 1s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg);} }
+  .loading-text{
+    font-family:"Shippori Mincho", serif;
+    font-size:18px;
+    color:var(--gold-deep);
+    min-height:30px;
+    animation:pulse 1s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{ opacity:1;} 50%{ opacity:.55;} }
+  .loading-sub{ font-size:12.5px; color:var(--ink-soft); margin-top:14px; }
+
+  /* ---- 結果画面 ---- */
+  .result-badge{
+    text-align:center;
+    margin:0 auto 6px;
+    width:84px; height:84px;
+    line-height:84px;
+    font-size:40px;
+    border-radius:50%;
+    background:var(--gold-pale);
+    box-shadow:inset 0 0 0 2px rgba(200,162,75,.4);
+  }
+  .result-type{
+    text-align:center;
+    font-size:13px;
+    letter-spacing:.16em;
+    color:var(--gold-deep);
+    font-weight:700;
+    margin-top:8px;
+  }
+  .result-title{
+    font-family:"Shippori Mincho", serif;
+    text-align:center;
+    font-size:26px;
+    margin:4px 0 0;
+  }
+  .result-desc{
+    font-size:15px;
+    margin-top:18px;
+  }
+  .result-tip{
+    background:var(--green-pale);
+    border-radius:16px;
+    padding:16px 18px;
+    margin-top:18px;
+    font-size:14.5px;
+    color:#4f6e4c;
+  }
+  .result-tip .tip-head{
+    display:block;
+    font-weight:700;
+    color:var(--green);
+    font-size:12.5px;
+    letter-spacing:.08em;
+    margin-bottom:4px;
+  }
+
+  /* 解析スコアの小さな内訳（おまけ表示・エンタメ感） */
+  .meter-list{ margin-top:22px; }
+  .meter{
+    margin-top:12px;
+  }
+  .meter-label{
+    display:flex; justify-content:space-between;
+    font-size:12px; color:var(--ink-soft); margin-bottom:5px;
+  }
+  .meter-bar{
+    height:8px; border-radius:8px;
+    background:var(--gold-pale);
+    overflow:hidden;
+  }
+  .meter-fill{
+    height:100%; border-radius:8px;
+    background:linear-gradient(90deg, var(--green), var(--gold));
+    width:0%;
+    transition:width 1s ease .2s;
+  }
+
+  .supplement{
+    font-size:12px;
+    color:var(--ink-soft);
+    text-align:center;
+    margin-top:20px;
+    line-height:1.7;
+  }
+
+  /* ---- 予約前準備案内 ---- */
+  .prep{
+    background:linear-gradient(180deg, #fff, var(--gold-pale));
+    border-radius:var(--radius);
+    box-shadow:var(--shadow-sm);
+    padding:24px 22px;
+    margin-top:18px;
+    border:1px solid rgba(200,162,75,.18);
+  }
+  .prep h2{
+    font-family:"Shippori Mincho", serif;
+    font-size:18px;
+    text-align:center;
+    margin:0 0 10px;
+    color:var(--gold-deep);
+  }
+  .prep-row{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    font-size:14.5px;
+    margin-top:12px;
+  }
+  .prep-row .ic{
+    flex:0 0 36px;
+    width:36px; height:36px; line-height:36px;
+    text-align:center;
+    background:#fff;
+    border-radius:50%;
+    font-size:18px;
+    box-shadow:var(--shadow-sm);
+  }
+
+  /* フッターのごく小さな注記 */
+  .foot{
+    text-align:center;
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-top:26px;
+    line-height:1.7;
+  }
+
+  /* 解析用Canvasは画面に出さない */
+  #analyzeCanvas{ display:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ブランドマーク（全画面共通の小さなヘッダー） -->
+  <div class="brand"><span class="palm">✋</span>てのひら節電診断</div>
+
+  <!-- ============================================================
+       画面1：トップ画面
+       ============================================================ -->
+  <section id="screen-top" class="screen active">
+    <div class="card">
+      <!-- 手のひらのシンプルなSVGアイコン -->
+      <svg class="palm-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M30 86c-7-6-12-16-12-28V40c0-3 5-3 5 0v14c0 1 2 1 2 0V26c0-4 6-4 6 0v26c0 1 2 1 2 0V20c0-4 6-4 6 0v32c0 1 2 1 2 0V24c0-4 6-4 6 0v28c0 1 2 1 2 0V32c0-4 6-4 6 0v30c0 12-5 19-11 24"
+          stroke="#c8a24b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M28 58c6 4 16 5 24 1" stroke="#6fa56b" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+        <path d="M30 66c5 3 13 4 19 1" stroke="#6fa56b" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+      </svg>
+
+      <h1>金運手相でわかる！<br>あなたの<span class="accent">節電タイプ</span>診断</h1>
+
+      <p class="lead">手のひらの線や全体バランスから、<br>あなたに合いそうな節電スタイルを<br>楽しく診断します。</p>
+
+      <!-- エンタメであることを明示（断定しない） -->
+      <div class="note">この診断はエンタメコンテンツです。<br>手相・金運・将来を断定するものではありません。</div>
+
+      <button class="btn btn-primary" onclick="goTo('screen-upload')">手のひらを撮影して診断する</button>
+    </div>
+
+    <p class="foot">所要時間：約1分／写真はこの端末内だけで処理され、<br>どこにも送信・保存されません。</p>
+  </section>
+
+  <!-- ============================================================
+       画面2：手のひら撮影・画像アップロード画面
+       ============================================================ -->
+  <section id="screen-upload" class="screen">
+    <div class="card">
+      <p class="upload-hint">明るい場所で、手のひら全体が<br>写るように撮影してください。</p>
+
+      <!-- プレビュー枠（最初はプレースホルダー、選ぶと画像表示） -->
+      <div class="preview-box" id="previewBox">
+        <div class="preview-placeholder" id="previewPlaceholder">
+          <span class="big">📷</span>
+          ここに手のひらの写真が表示されます
+        </div>
+      </div>
+
+      <!-- カメラ起動 or 画像選択。capture属性でスマホはカメラ優先 -->
+      <input type="file" id="fileInput" accept="image/*" capture="environment">
+      <label for="fileInput" class="btn btn-ghost" style="text-align:center;">写真を選ぶ</label>
+
+      <!-- 画像が選ばれるまでは押せない -->
+      <button class="btn btn-primary" id="diagnoseBtn" onclick="startDiagnose()" disabled style="opacity:.5;">診断する</button>
+    </div>
+    <p class="foot">うまく写らないときは、手のひらを画面いっぱいに、<br>影が入らないように撮るときれいに診断できます。</p>
+  </section>
+
+  <!-- ============================================================
+       画面3：診断中画面（3秒間・文言を順番に切り替え）
+       ============================================================ -->
+  <section id="screen-loading" class="screen">
+    <div class="card">
+      <div class="loading-wrap">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">手のひらの線をチェック中…</div>
+        <div class="loading-sub">あなたの手のひらを読み取っています</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       画面4＆5：結果画面 ＋ 予約前準備案内
+       ============================================================ -->
+  <section id="screen-result" class="screen">
+    <!-- 結果カード -->
+    <div class="card">
+      <div class="result-badge" id="resultIcon">🌱</div>
+      <div class="result-type" id="resultTag">YOUR TYPE</div>
+      <div class="result-title">あなたは<span id="resultName">〇〇</span>タイプ</div>
+
+      <p class="result-desc" id="resultDesc"></p>
+
+      <div class="result-tip">
+        <span class="tip-head">相性のよさそうな節電スタイル</span>
+        <span id="resultStyle"></span>
+      </div>
+
+      <!-- 解析スコアの内訳（おまけ・エンタメ感を出す可視化） -->
+      <div class="meter-list" id="meterList"></div>
+
+      <p class="supplement">手のひら画像の線の出方や全体バランスから、<br>エンタメ診断としてタイプを判定しています。</p>
+    </div>
+
+    <!-- 予約前準備案内（結果の下に自然に表示） -->
+    <div class="prep">
+      <h2>診断日の前に、ひとつだけ</h2>
+      <div class="prep-row">
+        <span class="ic">🧾</span>
+        <span>診断日までに、電気代明細を1枚だけご準備ください。</span>
+      </div>
+      <div class="prep-row">
+        <span class="ic">🍵</span>
+        <span>当日は、あなたの暮らしに合う節電方法を一緒に確認します。</span>
+      </div>
+
+      <button class="btn btn-green" onclick="goTo('screen-guide')">電気代明細の見方を確認する</button>
+      <button class="btn btn-ghost" onclick="resetAll()">もう一度診断する</button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       おまけ画面：電気代明細の見方ガイド
+       （CTAの遷移先。売り込みではなく準備の補助）
+       ============================================================ -->
+  <section id="screen-guide" class="screen">
+    <div class="card">
+      <h1 style="font-size:21px;">電気代明細の<br>かんたんな見方</h1>
+      <p class="lead" style="margin-top:14px;">当日スムーズにお話しできるよう、<br>下の3か所だけ見ておくと安心です。</p>
+
+      <div class="prep-row" style="margin-top:22px;">
+        <span class="ic">①</span>
+        <span><b>ご契約プラン・契約アンペア</b><br>明細の上のほうに書かれていることが多いです。</span>
+      </div>
+      <div class="prep-row">
+        <span class="ic">②</span>
+        <span><b>今月の使用量（kWh）</b><br>「使用電力量」などの欄の数字です。</span>
+      </div>
+      <div class="prep-row">
+        <span class="ic">③</span>
+        <span><b>請求金額</b><br>季節での変化も見ておくと話が早いです。</span>
+      </div>
+
+      <div class="note" style="margin-top:24px;">明細が見つからないときは、電力会社のWebサイトやアプリでも確認できます。当日一緒に探すこともできますのでご安心ください。</div>
+
+      <button class="btn btn-primary" onclick="goTo('screen-result')">結果画面にもどる</button>
+      <button class="btn btn-ghost" onclick="resetAll()">もう一度診断する</button>
+    </div>
+  </section>
+
+  <!-- 画像解析用の隠しCanvas -->
+  <canvas id="analyzeCanvas"></canvas>
+
+</div>
+
+<script>
+/* =================================================================
+   画面切り替え
+   ================================================================= */
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+/* =================================================================
+   画像の読み込み＆プレビュー
+   ================================================================= */
+const fileInput   = document.getElementById('fileInput');
+const previewBox  = document.getElementById('previewBox');
+const diagnoseBtn = document.getElementById('diagnoseBtn');
+let   loadedImage = null;   // 解析対象のImageオブジェクト
+
+fileInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    // プレビュー画像を表示
+    previewBox.innerHTML = '<img id="previewImg" alt="手のひらプレビュー">';
+    const img = document.getElementById('previewImg');
+    img.src = ev.target.result;
+
+    // 解析用のImageを用意（読み込み完了で診断ボタンを有効化）
+    loadedImage = new Image();
+    loadedImage.onload = () => {
+      diagnoseBtn.disabled = false;
+      diagnoseBtn.style.opacity = '1';
+    };
+    loadedImage.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+/* =================================================================
+   診断開始：3秒の演出 → 解析 → 結果表示
+   ================================================================= */
+const loadingMessages = [
+  '手のひらの線をチェック中…',     // 1秒目
+  '金運バランスを読み取り中…',     // 2秒目
+  'あなたの節電タイプを診断中…'    // 3秒目
+];
+
+function startDiagnose(){
+  if(!loadedImage) return;
+
+  goTo('screen-loading');
+
+  // 文言を1秒ごとに切り替え
+  const textEl = document.getElementById('loadingText');
+  textEl.textContent = loadingMessages[0];
+  let i = 1;
+  const timer = setInterval(() => {
+    if(i < loadingMessages.length){
+      textEl.textContent = loadingMessages[i];
+      i++;
+    }
+  }, 1000);
+
+  // 3秒後に解析して結果へ
+  setTimeout(() => {
+    clearInterval(timer);
+    const features = analyzeImage(loadedImage);   // 画像の簡易解析
+    const result   = classify(features);          // スコアでタイプ分類
+    showResult(result, features);
+    goTo('screen-result');
+  }, 3000);
+}
+
+/* =================================================================
+   画像の簡易解析（Canvas / 外部ライブラリ不使用）
+   取得する特徴：
+     - 明るさ（brightness）
+     - コントラスト（contrast：明るさの標準偏差）
+     - エッジ量（edge：簡易勾配の平均）
+     - 線の多さ（lineCount：エッジが強い画素の割合）
+     - 中央付近の線の強さ（centerEdge）
+     - 濃淡バランス（balance：領域ごとの明るさのばらつき）
+   手順：縮小して読み込み → グレースケール化 → 簡易エッジ検出
+   ================================================================= */
+function analyzeImage(img){
+  const canvas = document.getElementById('analyzeCanvas');
+  const ctx = canvas.getContext('2d', { willReadFrequently:true });
+
+  // 処理を軽くするため固定サイズに縮小（手相の傾向把握には十分）
+  const W = 160, H = 160;
+  canvas.width = W; canvas.height = H;
+  ctx.drawImage(img, 0, 0, W, H);
+
+  const data = ctx.getImageData(0, 0, W, H).data;
+
+  // ---- 1) グレースケール配列を作成 ----
+  const gray = new Float32Array(W * H);
+  let sum = 0;
+  for(let p = 0; p < W * H; p++){
+    const r = data[p*4], g = data[p*4+1], b = data[p*4+2];
+    // 輝度の標準的な重み付け
+    const lum = 0.299*r + 0.587*g + 0.114*b;
+    gray[p] = lum;
+    sum += lum;
+  }
+  const brightness = sum / (W * H);            // 平均の明るさ（0–255）
+
+  // ---- 2) コントラスト（明るさの標準偏差） ----
+  let varSum = 0;
+  for(let p = 0; p < W * H; p++){
+    const d = gray[p] - brightness;
+    varSum += d * d;
+  }
+  const contrast = Math.sqrt(varSum / (W * H)); // 標準偏差
+
+  // ---- 3) 簡易エッジ検出（隣接画素との差） ----
+  // 右隣・下隣との差の大きさ（Sobelの簡易版）を勾配として使う
+  let edgeSum = 0;
+  let strongEdge = 0;                  // 線として強い画素の数
+  let centerEdgeSum = 0, centerCount = 0;
+  const STRONG = 28;                   // 「線」とみなす勾配のしきい値
+
+  for(let y = 0; y < H - 1; y++){
+    for(let x = 0; x < W - 1; x++){
+      const p  = y * W + x;
+      const gx = Math.abs(gray[p] - gray[p + 1]);     // 横方向の変化
+      const gy = Math.abs(gray[p] - gray[p + W]);     // 縦方向の変化
+      const mag = gx + gy;                            // 勾配の強さ
+      edgeSum += mag;
+      if(mag > STRONG) strongEdge++;
+
+      // 中央付近（画像の中心40%領域）の線の強さ
+      if(x > W*0.3 && x < W*0.7 && y > H*0.3 && y < H*0.7){
+        centerEdgeSum += mag;
+        centerCount++;
+      }
+    }
+  }
+  const edge       = edgeSum / (W * H);                 // 平均エッジ量
+  const lineCount  = strongEdge / (W * H);              // 強い線の割合（0–1）
+  const centerEdge = centerEdgeSum / Math.max(1, centerCount);
+
+  // ---- 4) 濃淡バランス（画像を3×3に分け、各領域の平均明るさのばらつき） ----
+  const regions = new Array(9).fill(0);
+  const counts  = new Array(9).fill(0);
+  for(let y = 0; y < H; y++){
+    for(let x = 0; x < W; x++){
+      const rx = Math.min(2, Math.floor(x / (W/3)));
+      const ry = Math.min(2, Math.floor(y / (H/3)));
+      const idx = ry * 3 + rx;
+      regions[idx] += gray[y*W + x];
+      counts[idx]++;
+    }
+  }
+  const regionMeans = regions.map((s, k) => s / counts[k]);
+  const regionAvg   = regionMeans.reduce((a,b)=>a+b,0) / 9;
+  let regionVar = 0;
+  regionMeans.forEach(m => { regionVar += (m - regionAvg) ** 2; });
+  const balance = Math.sqrt(regionVar / 9);   // 領域ごとの明暗のばらつき
+
+  return { brightness, contrast, edge, lineCount, centerEdge, balance };
+}
+
+/* =================================================================
+   タイプ分類（完全ランダムではなく、解析スコアで判定）
+   A. コツコツ貯蓄型 ：線が多い・エッジ量が多い・コントラストが高い
+   B. 直感チャレンジ型：線の流れにばらつき・明るさや濃淡の変化が大きい
+   C. 家族安心型     ：全体が明るめ・線がなめらか（エッジは中程度）
+   各タイプの「らしさ」を点数化し、最も高いものを採用する。
+   ================================================================= */
+function classify(f){
+  // 各特徴を0–1に正規化（経験的なスケール）
+  const nContrast = clamp01(f.contrast   / 70);
+  const nEdge     = clamp01(f.edge       / 40);
+  const nLines    = clamp01(f.lineCount  / 0.20);
+  const nBright   = clamp01(f.brightness / 220);
+  const nBalance  = clamp01(f.balance    / 45);
+  const nCenter   = clamp01(f.centerEdge / 40);
+
+  // A：線・エッジ・コントラストが高いほど高得点
+  const scoreA = nLines*0.4 + nEdge*0.35 + nContrast*0.25;
+
+  // B：濃淡のばらつき・コントラストの変化が大きいほど高得点
+  const scoreB = nBalance*0.45 + nContrast*0.25 + nCenter*0.30;
+
+  // C：明るくて、エッジは中程度（強すぎない）ほど高得点
+  //    エッジが中庸（0.5付近）で最大になる山型スコアを使う
+  const midEdge = 1 - Math.abs(nEdge - 0.5) * 2;
+  const scoreC = nBright*0.5 + clamp01(midEdge)*0.3 + (1 - nLines)*0.2;
+
+  const scores = { A:scoreA, B:scoreB, C:scoreC };
+  // 最高得点のタイプを選ぶ
+  const best = Object.keys(scores).reduce((a,b)=> scores[a] >= scores[b] ? a : b);
+
+  return { type:best, scores };
+}
+
+function clamp01(v){ return Math.max(0, Math.min(1, v)); }
+
+/* =================================================================
+   タイプ別の表示内容（文言は仕様書どおり）
+   ================================================================= */
+const TYPES = {
+  A:{
+    name:'コツコツ貯蓄', icon:'📒', tag:'TYPE A',
+    desc:'細かな変化に気づきやすく、毎月のムダを整えるのが得意なタイプです。',
+    style:'電気代の見える化、待機電力カット、料金プランの見直しと相性がよさそうです。'
+  },
+  B:{
+    name:'直感チャレンジ', icon:'✨', tag:'TYPE B',
+    desc:'新しいものを試す感覚があり、未来の変化に反応しやすいタイプです。',
+    style:'スマート家電、太陽光、蓄電池など、新しい節電設備の情報収集と相性がよさそうです。'
+  },
+  C:{
+    name:'家族安心', icon:'🏡', tag:'TYPE C',
+    desc:'自分だけでなく、家族の安心や暮らしの安定を大切にするタイプです。',
+    style:'停電対策、災害備え、家族でできる省エネ習慣と相性がよさそうです。'
+  }
+};
+
+/* =================================================================
+   結果画面に内容を流し込む
+   ================================================================= */
+function showResult(result, features){
+  const t = TYPES[result.type];
+
+  document.getElementById('resultIcon').textContent = t.icon;
+  document.getElementById('resultTag').textContent  = t.tag;
+  document.getElementById('resultName').textContent = t.name;
+  document.getElementById('resultDesc').textContent = t.desc;
+  document.getElementById('resultStyle').textContent = t.style;
+
+  // 解析スコアの内訳をメーターで表示（エンタメの可視化）
+  const meters = [
+    { label:'手相の線の多さ',     value:clamp01(features.lineCount / 0.20) },
+    { label:'金運バランス（濃淡）', value:clamp01(features.balance   / 45)   },
+    { label:'運気のメリハリ',     value:clamp01(features.contrast  / 70)   },
+    { label:'手のひらの明るさ',   value:clamp01(features.brightness/ 220)  }
+  ];
+  const list = document.getElementById('meterList');
+  list.innerHTML = '';
+  meters.forEach(m => {
+    const pct = Math.round(20 + m.value * 75);   // 見栄えのため20–95%の範囲に
+    list.insertAdjacentHTML('beforeend', `
+      <div class="meter">
+        <div class="meter-label"><span>${m.label}</span><span>${pct}%</span></div>
+        <div class="meter-bar"><div class="meter-fill" data-w="${pct}"></div></div>
+      </div>`);
+  });
+  // 少し遅らせてバーをアニメーション
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.meter-fill').forEach(el => {
+      el.style.width = el.dataset.w + '%';
+    });
+  });
+}
+
+/* =================================================================
+   最初からやり直す
+   ================================================================= */
+function resetAll(){
+  loadedImage = null;
+  fileInput.value = '';
+  diagnoseBtn.disabled = true;
+  diagnoseBtn.style.opacity = '.5';
+  previewBox.innerHTML = '<div class="preview-placeholder"><span class="big">📷</span>ここに手のひらの写真が表示されます</div>';
+  goTo('screen-top');
+}
+</script>
+</body>
+</html>
