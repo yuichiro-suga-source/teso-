@@ -4,613 +4,591 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>金運手相でわかる！あなたの暮らしタイプ診断</title>
-
-<!-- 占い感を少しだけ出す明朝（見出し）＋親しみやすい丸ゴシック（本文） -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  /* =========================================================
-     カラーテーマ：白・ゴールド・薄いグリーン
-     占い7割／暮らし2割／節電1割の読みものとして、
-     清潔で安心感のあるトーンに。
-     ========================================================= */
-  :root{
-    --bg:#fbfaf6; --card:#ffffff; --ink:#3a3a34; --ink-soft:#837f74;
-    --gold:#c8a24b; --gold-deep:#a8842f; --gold-pale:#f4ecd6;
-    --green:#6fa56b; --green-pale:#e9f1e6; --line:#ece6d6;
-    --shadow:0 10px 30px rgba(160,140,80,.12);
-    --shadow-sm:0 4px 14px rgba(160,140,80,.10);
-    --radius:22px;
-  }
-  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html,body{ margin:0; padding:0; }
-  body{
-    font-family:"Zen Maru Gothic", system-ui, sans-serif;
-    color:var(--ink); background:var(--bg);
-    background-image:
-      radial-gradient(circle at 18% 0%, rgba(200,162,75,.05), transparent 45%),
-      radial-gradient(circle at 92% 18%, rgba(111,165,107,.06), transparent 40%);
-    line-height:1.9; -webkit-font-smoothing:antialiased;
-  }
-  .wrap{ max-width:480px; margin:0 auto; padding:0 18px 44px; min-height:100vh; }
-  .screen{ display:none; animation:fadeIn .5s ease both; }
-  .screen.active{ display:block; }
-  @keyframes fadeIn{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+:root{
+  --bg:#fbfaf6; --card:#fff; --ink:#3a3a34; --soft:#837f74;
+  --gold:#c8a24b; --gold-d:#a8842f; --gold-p:#f4ecd6;
+  --green:#6fa56b; --green-p:#e9f1e6; --line:#ece6d6;
+  --sh:0 10px 30px rgba(160,140,80,.12);
+  --sh2:0 4px 14px rgba(160,140,80,.10);
+  --r:22px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{background:var(--bg)}
+body{
+  font-family:"Zen Maru Gothic",system-ui,sans-serif;
+  color:var(--ink);line-height:1.9;
+  -webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(circle at 18% 0%,rgba(200,162,75,.05),transparent 45%),
+    radial-gradient(circle at 92% 18%,rgba(111,165,107,.06),transparent 40%);
+}
+.wrap{max-width:480px;margin:0 auto;padding:0 18px 48px;min-height:100vh}
 
-  .brand{ text-align:center; padding:26px 0 6px; font-size:12px; letter-spacing:.18em; color:var(--gold-deep); font-weight:700; }
-  .brand .palm{ font-size:22px; display:block; margin-bottom:2px; }
+/* 画面切り替え */
+.scr{display:none}
+.scr.on{display:block;animation:fi .4s ease both}
+@keyframes fi{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
-  .card{ background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:30px 24px; margin-top:18px; border:1px solid rgba(200,162,75,.12); }
+/* ブランド */
+.brand{text-align:center;padding:24px 0 4px;font-size:12px;letter-spacing:.18em;color:var(--gold-d);font-weight:700}
+.brand i{font-size:22px;display:block;margin-bottom:2px;font-style:normal}
 
-  h1{ font-family:"Shippori Mincho", serif; font-size:25px; line-height:1.55; margin:6px 0 2px; text-align:center; }
-  h1 .accent{ color:var(--gold-deep); }
-  .lead{ text-align:center; font-size:15px; margin:14px 4px 0; }
+/* カード */
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:30px 22px;margin-top:16px;border:1px solid rgba(200,162,75,.12)}
 
-  .note{ background:var(--green-pale); color:#5c7a58; font-size:12.5px; line-height:1.7; border-radius:14px; padding:12px 16px; margin-top:20px; text-align:center; }
+/* 見出し */
+h1{font-family:"Shippori Mincho",serif;font-size:24px;line-height:1.55;text-align:center}
+h1 .ac{color:var(--gold-d)}
+.lead{text-align:center;font-size:15px;margin-top:14px}
+.note{background:var(--green-p);color:#5c7a58;font-size:13px;line-height:1.75;border-radius:14px;padding:12px 16px;margin-top:18px;text-align:center}
 
-  .btn{ display:block; width:100%; border:none; cursor:pointer; font-family:inherit; font-weight:700; font-size:16.5px; padding:18px 20px; border-radius:16px; margin-top:16px; transition:transform .12s ease, box-shadow .2s ease, opacity .2s; }
-  .btn:active{ transform:scale(.98); }
-  .btn-primary{ background:linear-gradient(135deg,#d9b45f,var(--gold) 60%,var(--gold-deep)); color:#fff; box-shadow:0 8px 20px rgba(168,132,47,.28); }
-  .btn-green{ background:var(--green); color:#fff; box-shadow:0 8px 18px rgba(111,165,107,.26); }
-  .btn-ghost{ background:#fff; color:var(--gold-deep); border:1.5px solid var(--gold); }
+/* ボタン */
+.btn{display:block;width:100%;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:17px;padding:18px 20px;border-radius:16px;margin-top:14px;transition:transform .1s,opacity .2s}
+.btn:active{transform:scale(.97)}
+.btn-gold{background:linear-gradient(135deg,#d9b45f,var(--gold) 60%,var(--gold-d));color:#fff;box-shadow:0 8px 20px rgba(168,132,47,.28)}
+.btn-green{background:var(--green);color:#fff;box-shadow:0 8px 18px rgba(111,165,107,.26)}
+.btn-ghost{background:#fff;color:var(--gold-d);border:1.5px solid var(--gold)}
+.btn:disabled,.btn[disabled]{opacity:.45;pointer-events:none}
 
-  .palm-icon{ width:96px; height:96px; margin:4px auto 10px; display:block; }
+/* プレビュー */
+.prev{margin-top:18px;border-radius:18px;overflow:hidden;background:var(--gold-p);border:2px dashed rgba(200,162,75,.4);min-height:200px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--soft);font-size:13px}
+.prev img{width:100%;display:block}
+.prev-ph{padding:40px 20px}
+.prev-ph .big{font-size:36px;display:block;margin-bottom:8px}
 
-  .upload-hint{ text-align:center; font-size:14.5px; margin:6px 4px 4px; }
-  .preview-box{ margin-top:18px; border-radius:18px; overflow:hidden; background:var(--gold-pale); border:2px dashed rgba(200,162,75,.45); min-height:200px; display:flex; align-items:center; justify-content:center; text-align:center; color:var(--ink-soft); font-size:13px; }
-  .preview-box img{ width:100%; display:block; }
-  .preview-placeholder{ padding:40px 20px; }
-  .preview-placeholder .big{ font-size:34px; display:block; margin-bottom:8px; }
-  /* file inputs は各要素にインラインで display:none を指定済み */
+/* ローディング */
+.ldwrap{text-align:center;padding:56px 0 40px}
+.spin{width:88px;height:88px;margin:0 auto 26px;border-radius:50%;border:5px solid var(--gold-p);border-top-color:var(--gold);animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.ldtxt{font-family:"Shippori Mincho",serif;font-size:19px;color:var(--gold-d);animation:pu 1s ease-in-out infinite}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.5}}
+.ldsub{font-size:13px;color:var(--soft);margin-top:14px}
 
-  /* 診断中 */
-  .loading-wrap{ text-align:center; padding:60px 0 40px; }
-  .spinner{ width:90px; height:90px; margin:0 auto 28px; border-radius:50%; border:5px solid var(--gold-pale); border-top-color:var(--gold); animation:spin 1s linear infinite; }
-  @keyframes spin{ to{ transform:rotate(360deg);} }
-  .loading-text{ font-family:"Shippori Mincho", serif; font-size:18px; color:var(--gold-deep); min-height:30px; animation:pulse 1s ease-in-out infinite; }
-  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.55;} }
-  .loading-sub{ font-size:12.5px; color:var(--ink-soft); margin-top:14px; }
+/* 結果 */
+.rbadge{width:86px;height:86px;line-height:86px;border-radius:50%;background:var(--gold-p);box-shadow:inset 0 0 0 2px rgba(200,162,75,.4);font-size:40px;text-align:center;margin:0 auto 6px}
+.rtag{text-align:center;font-size:13px;letter-spacing:.16em;color:var(--gold-d);font-weight:700;margin-top:8px}
+.rtitle{font-family:"Shippori Mincho",serif;text-align:center;font-size:30px;margin:4px 0 0}
+.rcatch{text-align:center;font-size:16px;line-height:1.85;color:var(--ink);margin-top:10px}
 
-  /* ===== 結果画面 ===== */
-  .result-badge{ text-align:center; margin:0 auto 6px; width:84px; height:84px; line-height:84px; font-size:40px; border-radius:50%; background:var(--gold-pale); box-shadow:inset 0 0 0 2px rgba(200,162,75,.4); }
-  .result-type{ text-align:center; font-size:14px; letter-spacing:.16em; color:var(--gold-deep); font-weight:700; margin-top:10px; }
-  .result-title{ font-family:"Shippori Mincho", serif; text-align:center; font-size:31px; line-height:1.4; margin:6px 0 0; }
-  .result-catch{ text-align:center; font-size:16.5px; line-height:1.85; color:var(--ink); margin-top:14px; }
+/* セクション見出し */
+.sh{display:flex;align-items:center;gap:9px;font-family:"Shippori Mincho",serif;font-size:21px;color:var(--gold-d);margin:36px 0 14px;padding-bottom:9px;border-bottom:1px solid var(--line)}
+.sh .n{flex:0 0 28px;width:28px;height:28px;line-height:28px;text-align:center;background:var(--gold-p);border-radius:50%;font-size:14px;font-weight:700}
+.sb{font-size:16px;line-height:2}
 
-  .sec-head{ display:flex; align-items:center; gap:10px; font-family:"Shippori Mincho", serif; font-size:22px; color:var(--gold-deep); margin:40px 0 16px; padding-bottom:10px; border-bottom:1px solid var(--line); }
-  .sec-head .num{ flex:0 0 30px; width:30px; height:30px; line-height:30px; text-align:center; background:var(--gold-pale); color:var(--gold-deep); border-radius:50%; font-size:15px; font-weight:700; }
-  .sec-body{ font-size:17px; line-height:2; }
+/* 金運2線カード */
+.ml{background:linear-gradient(180deg,#fffdf5,#fbf4e0);border:1px solid rgba(200,162,75,.3);border-radius:18px;padding:18px;margin-top:14px}
+.ml-top{display:flex;align-items:baseline;justify-content:space-between}
+.ml-name{font-family:"Shippori Mincho",serif;font-size:19px;font-weight:700;color:var(--gold-d)}
+.ml-name small{display:block;font-family:"Zen Maru Gothic",sans-serif;font-weight:400;font-size:12px;color:var(--soft);margin-top:2px}
+.ml-sc{font-size:22px;font-weight:700;color:var(--gold-d)}
+.ml-bar{height:12px;border-radius:12px;background:#fff;box-shadow:inset 0 0 0 1px rgba(200,162,75,.25);overflow:hidden;margin-top:10px}
+.ml-fill{height:100%;border-radius:12px;background:linear-gradient(90deg,var(--green),var(--gold));width:0%;transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.ml-read{font-size:15px;line-height:1.9;margin-top:12px}
 
-  /* 手相チャート（6本の線） */
-  .palm-chart{ margin-top:6px; }
+/* 吉相 */
+.lucky{background:#fff7e6;border:1px solid rgba(200,162,75,.35);border-radius:16px;padding:14px 16px;margin-top:14px;display:flex;gap:12px;align-items:flex-start}
+.lucky .lic{flex:0 0 28px;font-size:23px;line-height:1.3}
+.lucky b{display:block;font-size:16px;color:var(--gold-d);margin-bottom:3px}
+.lucky span{font-size:14px;line-height:1.8}
 
-  /* 金運2線（太陽線・財運線）の大きめカード */
-  .money-line{ background:linear-gradient(180deg,#fffdf5,#fbf4e0); border:1px solid rgba(200,162,75,.3); border-radius:18px; padding:18px 18px; margin-top:14px; }
-  .money-line .ml-top{ display:flex; align-items:baseline; justify-content:space-between; }
-  .money-line .ml-name{ font-family:"Shippori Mincho", serif; font-size:19px; font-weight:700; color:var(--gold-deep); }
-  .money-line .ml-name small{ display:block; font-family:"Zen Maru Gothic",sans-serif; font-weight:400; font-size:12.5px; color:var(--ink-soft); margin-top:2px; }
-  .money-line .ml-score{ font-size:22px; font-weight:700; color:var(--gold-deep); }
-  .money-line .ml-bar{ height:13px; border-radius:13px; background:#fff; box-shadow:inset 0 0 0 1px rgba(200,162,75,.25); overflow:hidden; margin-top:10px; }
-  .money-line .ml-fill{ height:100%; border-radius:13px; background:linear-gradient(90deg,var(--green),var(--gold)); width:0%; transition:width 1.2s cubic-bezier(.2,.8,.2,1); }
-  .money-line .ml-read{ font-size:15px; line-height:1.85; margin-top:12px; }
+/* 手相チャート */
+.pline{margin-top:18px}
+.pline-top{display:flex;justify-content:space-between;align-items:baseline}
+.pline-name{font-weight:700;font-size:16px}
+.pline-name small{display:block;color:var(--soft);font-weight:400;font-size:12px;margin-top:2px}
+.pline-sc{font-size:15px;color:var(--gold-d);font-weight:700}
+.pline-bar{height:11px;border-radius:11px;background:var(--gold-p);overflow:hidden;margin-top:7px}
+.pline-fill{height:100%;border-radius:11px;background:linear-gradient(90deg,var(--green),var(--gold));width:0%;transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
 
-  /* 吉相ヒント */
-  .lucky{ background:#fff7e6; border:1px solid rgba(200,162,75,.4); border-radius:16px; padding:14px 16px; margin-top:14px; display:flex; gap:12px; align-items:flex-start; }
-  .lucky .lic{ flex:0 0 30px; font-size:24px; line-height:1.3; }
-  .lucky b{ display:block; font-size:16px; color:var(--gold-deep); margin-bottom:3px; }
-  .lucky span{ font-size:14px; line-height:1.8; }
-  .pline{ margin-top:20px; }
-  .pline-top{ display:flex; justify-content:space-between; align-items:baseline; }
-  .pline-name{ font-weight:700; font-size:17px; }
-  .pline-name small{ display:block; color:var(--ink-soft); font-weight:400; font-size:13px; margin:2px 0 0; }
-  .pline-score{ font-size:16px; color:var(--gold-deep); font-weight:700; }
-  .pline-bar{ height:12px; border-radius:12px; background:var(--gold-pale); overflow:hidden; margin-top:8px; }
-  .pline-fill{ height:100%; border-radius:12px; background:linear-gradient(90deg,var(--green),var(--gold)); width:0%; transition:width 1.1s cubic-bezier(.2,.8,.2,1); }
+/* ポイント */
+.pt{background:#fffdf7;border:1px solid rgba(200,162,75,.18);border-radius:18px;padding:18px;margin-top:14px;display:flex;gap:14px;align-items:flex-start}
+.pt .ic{flex:0 0 40px;width:40px;height:40px;line-height:40px;text-align:center;background:var(--gold-p);border-radius:12px;font-size:20px}
+.pt b{display:block;font-size:16px;margin-bottom:4px;line-height:1.4}
+.pt p{font-size:14px;line-height:1.85;margin:0}
 
-  /* 3つのポイント */
-  .point{ background:#fffdf7; border:1px solid rgba(200,162,75,.18); border-radius:18px; padding:18px 18px; margin-top:14px; display:flex; gap:14px; align-items:flex-start; }
-  .point .pic{ flex:0 0 42px; width:42px; height:42px; line-height:42px; text-align:center; background:var(--gold-pale); border-radius:12px; font-size:21px; }
-  .point .ptext b{ display:block; font-size:17px; margin-bottom:5px; line-height:1.5; }
-  .point .ptext span{ font-size:15px; line-height:1.85; color:var(--ink); }
+/* 金運・暮らし */
+.rb{background:var(--green-p);border-radius:16px;padding:18px 20px;margin-top:6px;font-size:16px;line-height:2;color:#4f6e4c}
 
-  .read-block{ background:var(--green-pale); border-radius:18px; padding:20px 20px; margin-top:6px; font-size:17px; line-height:2; color:#4f6e4c; }
+/* 節電（控えめ） */
+.sv{margin-top:18px;border:1px dashed rgba(111,165,107,.45);border-radius:16px;padding:16px 18px;background:#fbfdfa}
+.sv .st{font-size:14px;font-weight:700;color:var(--green);letter-spacing:.04em}
+.sv ul{margin:10px 0 0;padding-left:20px}
+.sv li{font-size:15px;line-height:1.9;margin:6px 0}
+.sv .sf{font-size:13px;color:var(--soft);margin-top:10px}
 
-  /* 節電は控えめ：細い枠の小さめカード（ただし読める大きさに） */
-  .saving{ margin-top:20px; border:1px dashed rgba(111,165,107,.5); border-radius:18px; padding:18px 20px; background:#fbfdfa; }
-  .saving .stitle{ font-size:14.5px; font-weight:700; color:var(--green); letter-spacing:.04em; }
-  .saving ul{ margin:12px 0 0; padding-left:22px; }
-  .saving li{ font-size:15.5px; line-height:1.85; margin:8px 0; }
-  .saving .sfoot{ font-size:13.5px; color:var(--ink-soft); margin-top:12px; }
+/* 補足 */
+.supp{font-size:12px;color:var(--soft);text-align:center;margin-top:22px;line-height:1.75}
 
-  .supplement{ font-size:13px; color:var(--ink-soft); text-align:center; margin-top:26px; line-height:1.8; }
+/* 電気代案内 */
+.bill{margin-top:18px;font-size:13px;color:var(--soft);text-align:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;line-height:1.85}
 
-  /* 電気代の案内：最下部に小さく（でも読める） */
-  .bill-note{ margin-top:20px; font-size:13.5px; color:var(--ink-soft); text-align:center; background:#fff; border:1px solid var(--line); border-radius:16px; padding:16px 18px; line-height:1.9; }
+/* 暮らしメモ */
+.mr{display:flex;gap:14px;align-items:flex-start;font-size:16px;line-height:1.9;margin-top:16px}
+.mr .ic{flex:0 0 42px;width:42px;height:42px;line-height:42px;text-align:center;background:var(--gold-p);border-radius:50%;font-size:21px}
+.mr b{display:block;font-size:17px;margin-bottom:2px}
 
-  /* 暮らしメモ画面 */
-  .memo-row{ display:flex; gap:14px; align-items:flex-start; font-size:16.5px; line-height:1.9; margin-top:18px; }
-  .memo-row .ic{ flex:0 0 42px; width:42px; height:42px; line-height:42px; text-align:center; background:var(--gold-pale); border-radius:50%; font-size:21px; }
-  .memo-row b{ font-size:17.5px; }
-
-  .foot{ text-align:center; font-size:11px; color:var(--ink-soft); margin-top:26px; line-height:1.7; }
-  #analyzeCanvas{ display:none; }
+.foot{text-align:center;font-size:11px;color:var(--soft);margin-top:24px;line-height:1.7}
+#cvs{display:none}
 </style>
 </head>
 <body>
 <div class="wrap">
+<div class="brand"><i>✋</i>てのひら暮らし診断</div>
 
-  <div class="brand"><span class="palm">✋</span>てのひら暮らし診断</div>
+<!-- ========== TOP ========== -->
+<section id="s-top" class="scr on">
+  <div class="card">
+    <svg viewBox="0 0 100 100" fill="none" style="width:92px;height:92px;display:block;margin:0 auto 12px">
+      <path d="M30 86c-7-6-12-16-12-28V40c0-3 5-3 5 0v14c0 1 2 1 2 0V26c0-4 6-4 6 0v26c0 1 2 1 2 0V20c0-4 6-4 6 0v32c0 1 2 1 2 0V24c0-4 6-4 6 0v28c0 1 2 1 2 0V32c0-4 6-4 6 0v30c0 12-5 19-11 24" stroke="#c8a24b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M28 58c6 4 16 5 24 1" stroke="#6fa56b" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+      <path d="M30 66c5 3 13 4 19 1" stroke="#6fa56b" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+    </svg>
+    <h1>金運手相でわかる！<br>あなたの<span class="ac">暮らしタイプ</span>診断</h1>
+    <p class="lead">手のひらの線や全体のバランスから、<br>金運やお金との付き合い方、<br>暮らしのクセを楽しく読み解きます。</p>
+    <div class="note">この診断はエンタメコンテンツです。<br>手相・金運・将来を断定するものではありません。<br>ご家族や友だちと一緒に楽しんでください。</div>
+    <button class="btn btn-gold" onclick="go('s-upload')">手のひらを撮影して診断する</button>
+  </div>
+  <p class="foot">所要時間：約1分／写真はこの端末内だけで処理され、<br>どこにも送信・保存されません。</p>
+</section>
 
-  <!-- ========== 画面1：トップ ========== -->
-  <section id="screen-top" class="screen active">
-    <div class="card">
-      <svg class="palm-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M30 86c-7-6-12-16-12-28V40c0-3 5-3 5 0v14c0 1 2 1 2 0V26c0-4 6-4 6 0v26c0 1 2 1 2 0V20c0-4 6-4 6 0v32c0 1 2 1 2 0V24c0-4 6-4 6 0v28c0 1 2 1 2 0V32c0-4 6-4 6 0v30c0 12-5 19-11 24" stroke="#c8a24b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M28 58c6 4 16 5 24 1" stroke="#6fa56b" stroke-width="2" stroke-linecap="round" opacity=".7"/>
-        <path d="M30 66c5 3 13 4 19 1" stroke="#6fa56b" stroke-width="2" stroke-linecap="round" opacity=".5"/>
-      </svg>
-      <h1>金運手相でわかる！<br>あなたの<span class="accent">暮らしタイプ</span>診断</h1>
-      <p class="lead">手のひらの線や全体のバランスから、<br>金運やお金との付き合い方、<br>暮らしのクセを楽しく読み解きます。</p>
-      <div class="note">この診断はエンタメコンテンツです。<br>手相・金運・将来を断定するものではありません。<br>ご家族や友だちと一緒に楽しんでください。</div>
-      <button class="btn btn-primary" onclick="goTo('screen-upload')">手のひらを撮影して診断する</button>
+<!-- ========== UPLOAD ========== -->
+<section id="s-upload" class="scr">
+  <div class="card">
+    <p style="text-align:center;font-size:15px;margin-bottom:4px">明るい場所で、手のひら全体が<br>写るように撮影してください。</p>
+    <div class="prev" id="prev">
+      <div class="prev-ph"><span class="big">📷</span>ここに手のひらの写真が表示されます</div>
     </div>
-    <p class="foot">所要時間：約1分／写真はこの端末内だけで処理され、<br>どこにも送信・保存されません。</p>
-  </section>
+    <!-- accept="image/*" のみ。captureなしで iOS/Android ともカメラ＆アルバム選択可 -->
+    <input type="file" id="fi" accept="image/*" style="display:none">
+    <label for="fi" class="btn btn-gold" style="text-align:center;margin-top:18px">📷 写真を撮る / 選ぶ</label>
+    <button class="btn btn-green" id="dbtn" onclick="startDiag()" disabled>この手のひらを診断する</button>
+  </div>
+  <p class="foot">手のひらを画面いっぱいに、影が入らないように撮ると<br>きれいに読み取れます。</p>
+</section>
 
-  <!-- ========== 画面2：撮影・アップロード ========== -->
-  <section id="screen-upload" class="screen">
-    <div class="card">
-      <p class="upload-hint">明るい場所で、手のひら全体が<br>写るように撮影してください。</p>
-      <div class="preview-box" id="previewBox">
-        <div class="preview-placeholder"><span class="big">📷</span>ここに手のひらの写真が表示されます</div>
-      </div>
-
-      <!-- カメラ起動（capture属性あり）-->
-      <input type="file" id="fileInputCamera" accept="image/*" capture="environment" style="display:none">
-      <!-- アルバム選択（capture属性なし＝ギャラリー）-->
-      <input type="file" id="fileInputAlbum"  accept="image/*" style="display:none">
-
-      <label for="fileInputCamera" class="btn btn-primary" style="text-align:center;">📷 カメラで撮影する</label>
-      <label for="fileInputAlbum"  class="btn btn-ghost"   style="text-align:center;">🖼 アルバムから選ぶ</label>
-
-      <button class="btn btn-green" id="diagnoseBtn" onclick="startDiagnose()" disabled style="opacity:.5;">この手のひらを診断する</button>
+<!-- ========== LOADING ========== -->
+<section id="s-load" class="scr">
+  <div class="card">
+    <div class="ldwrap">
+      <div class="spin"></div>
+      <div class="ldtxt" id="ldtxt">生命線を見ています…</div>
+      <div class="ldsub">手のひらの線をていねいに読み取っています</div>
     </div>
-    <p class="foot">手のひらを画面いっぱいに、影が入らないように撮ると、<br>線がきれいに読み取れます。</p>
-  </section>
-      <button class="btn btn-primary" id="diagnoseBtn" onclick="startDiagnose()" disabled style="opacity:.5;">診断する</button>
+  </div>
+</section>
+
+<!-- ========== RESULT ========== -->
+<section id="s-result" class="scr">
+  <div class="card">
+    <!-- タイプ -->
+    <div class="rbadge" id="ricon"></div>
+    <div class="rtag"   id="rtag"></div>
+    <div class="rtitle">あなたは<span id="rname"></span>タイプ</div>
+    <p class="rcatch"   id="rcatch"></p>
+
+    <!-- 金運2線 -->
+    <div class="sh"><span class="n">💰</span>金運を見る2つの線</div>
+    <p style="font-size:14px;color:var(--soft);margin:0 0 4px">手相で金運を見るときの定番、<b>薬指の下の「太陽線」</b>と<b>小指の下の「財運線」</b>を読み解きました。</p>
+    <div id="mlines"></div>
+    <div id="lhints"></div>
+
+    <!-- 6本チャート -->
+    <div class="sh"><span class="n">手</span>あなたの手相に出ていた線</div>
+    <div id="pchart"></div>
+
+    <!-- 3ポイント -->
+    <div class="sh"><span class="n">1</span>手相で見た3つのポイント</div>
+    <div id="pts"></div>
+
+    <!-- 金運 -->
+    <div class="sh"><span class="n">2</span>金運・お金との付き合い方</div>
+    <div class="rb" id="rmoney"></div>
+
+    <!-- 暮らし -->
+    <div class="sh"><span class="n">3</span>暮らしのクセ</div>
+    <div class="sb" id="rlife"></div>
+
+    <!-- 節電（控えめ） -->
+    <div class="sv">
+      <div class="st">＋ 相性のよい暮らしの見直しヒント</div>
+      <ul id="svlist"></ul>
+      <div class="sf" id="svfoot"></div>
     </div>
-    <p class="foot">手のひらを画面いっぱいに、影が入らないように撮ると、<br>線がきれいに読み取れます。</p>
-  </section>
 
-  <!-- ========== 画面3：診断中（演出文言を変更） ========== -->
-  <section id="screen-loading" class="screen">
-    <div class="card">
-      <div class="loading-wrap">
-        <div class="spinner"></div>
-        <div class="loading-text" id="loadingText">生命線を見ています…</div>
-        <div class="loading-sub">手のひらの線をていねいに読み取っています</div>
-      </div>
-    </div>
-  </section>
+    <p class="supp">手のひらの線の出方や全体のバランスから、<br>エンタメ診断として読み解いています。</p>
+    <div class="bill">診断日がある方は、最近の電気代をなんとなく見ておくと、<br>暮らしのクセが見つけやすくなります。</div>
 
-  <!-- ========== 画面4：結果（前半は手相、節電は最下部に控えめ） ========== -->
-  <section id="screen-result" class="screen">
-    <div class="card">
-      <!-- 1. あなたの手相タイプ -->
-      <div class="result-badge" id="resultIcon">🌱</div>
-      <div class="result-type" id="resultTag">YOUR TYPE</div>
-      <div class="result-title">あなたは<span id="resultName">〇〇</span>タイプ</div>
-      <p class="result-catch" id="resultCatch"></p>
+    <button class="btn btn-gold"  onclick="renderMemo();go('s-memo')">わが家の暮らしメモを見る</button>
+    <button class="btn btn-ghost" onclick="reset()">もう一度診断する</button>
+  </div>
+</section>
 
-      <!-- ★金運の2線（太陽線・財運線）を主役に ★ -->
-      <div class="sec-head"><span class="num">💰</span>金運を見る2つの線</div>
-      <p class="sec-body" style="margin:0 0 4px; font-size:14.5px; color:var(--ink-soft);">手相で金運を見るときの定番、<b>薬指の下の「太陽線」</b>と<b>小指の下の「財運線」</b>を読み解きました。</p>
-      <div id="moneyLines"></div>
-      <!-- 吉相のヒント（出たときだけ表示） -->
-      <div id="luckyHints"></div>
+<!-- ========== MEMO ========== -->
+<section id="s-memo" class="scr">
+  <div class="card">
+    <div id="memocnt"></div>
+    <button class="btn btn-gold"  onclick="go('s-result')" style="margin-top:28px">結果画面にもどる</button>
+    <button class="btn btn-ghost" onclick="reset()">もう一度診断する</button>
+  </div>
+</section>
 
-      <!-- 手相チャート（6本の線） -->
-      <div class="sec-head"><span class="num">手</span>あなたの手相に出ていた線</div>
-      <div class="palm-chart" id="palmChart"></div>
-
-      <!-- 2. 手相で見た3つのポイント -->
-      <div class="sec-head"><span class="num">1</span>手相で見た3つのポイント</div>
-      <div id="points"></div>
-
-      <!-- 3. 金運・お金との付き合い方 -->
-      <div class="sec-head"><span class="num">2</span>金運・お金との付き合い方</div>
-      <div class="read-block" id="moneyRead"></div>
-
-      <!-- 4. 暮らしのクセ -->
-      <div class="sec-head"><span class="num">3</span>暮らしのクセ</div>
-      <div class="sec-body" id="lifeRead"></div>
-
-      <!-- 5. 相性のよい暮らしの見直し（控えめ・今すぐ家でできることだけ） -->
-      <div class="saving">
-        <div class="stitle">＋ 相性のよい暮らしの見直しヒント</div>
-        <ul id="savingList"></ul>
-        <div class="sfoot" id="savingFoot"></div>
-      </div>
-
-      <p class="supplement">手のひらの線の出方や全体のバランスから、<br>エンタメ診断として読み解いています。</p>
-
-      <!-- 6. 電気代の案内（最下部に小さく・弱め） -->
-      <div class="bill-note">診断日がある方は、最近の電気代をなんとなく見ておくと、<br>暮らしのクセが見つけやすくなります。</div>
-
-      <button class="btn btn-primary" onclick="renderMemo(lastType); goTo('screen-memo')">わが家の暮らしメモを見る</button>
-      <button class="btn btn-ghost" onclick="resetAll()">もう一度診断する</button>
-    </div>
-  </section>
-
-  <!-- ========== 画面5：わが家の暮らしメモ（タイプ別） ========== -->
-  <section id="screen-memo" class="screen">
-    <div class="card">
-      <div id="memoContent"></div>
-      <button class="btn btn-primary" onclick="goTo('screen-result')" style="margin-top:28px;">結果画面にもどる</button>
-      <button class="btn btn-ghost" onclick="resetAll()">もう一度診断する</button>
-    </div>
-  </section>
-
-  <canvas id="analyzeCanvas"></canvas>
-</div>
+<canvas id="cvs"></canvas>
+</div><!-- /wrap -->
 
 <script>
-/* ================= 画面切り替え ================= */
-function goTo(id){
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo({ top:0, behavior:'smooth' });
+'use strict';
+
+/* ---- 画面切り替え ---- */
+function go(id){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
-/* ================= 画像読み込み＆プレビュー ================= */
-const previewBox  = document.getElementById('previewBox');
-const diagnoseBtn = document.getElementById('diagnoseBtn');
-let loadedImage   = null;
+/* ---- ファイル入力 ---- */
+let img = null;
+const fi   = document.getElementById('fi');
+const prev = document.getElementById('prev');
+const dbtn = document.getElementById('dbtn');
 
-// カメラ・アルバム、どちらのinputが変化しても同じ処理
-function onFileSelected(e){
-  const file = e.target.files[0];
+fi.addEventListener('change', e=>{
+  const file = e.target.files && e.target.files[0];
   if(!file) return;
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    previewBox.innerHTML = '<img id="previewImg" alt="手のひらプレビュー" style="width:100%;display:block;">';
-    document.getElementById('previewImg').src = ev.target.result;
-    loadedImage = new Image();
-    loadedImage.onload = () => { diagnoseBtn.disabled = false; diagnoseBtn.style.opacity = '1'; };
-    loadedImage.src = ev.target.result;
+  const rd = new FileReader();
+  rd.onload = ev=>{
+    prev.innerHTML = `<img src="${ev.target.result}" alt="プレビュー">`;
+    img = new Image();
+    img.onload = ()=>{ dbtn.disabled=false; };
+    img.src = ev.target.result;
   };
-  reader.readAsDataURL(file);
-}
-document.getElementById('fileInputCamera').addEventListener('change', onFileSelected);
-document.getElementById('fileInputAlbum').addEventListener('change',  onFileSelected);
+  rd.readAsDataURL(file);
+});
 
-/* ================= 診断中演出（文言変更） ================= */
-const loadingMessages = [
-  '生命線を見ています…',          // 1秒目
-  '知能線と金運線を見ています…',  // 2秒目
-  '暮らしのタイプを整えています…' // 3秒目
-];
-function startDiagnose(){
-  if(!loadedImage) return;
-  goTo('screen-loading');
-  const textEl = document.getElementById('loadingText');
-  textEl.textContent = loadingMessages[0];
-  let i = 1;
-  const timer = setInterval(() => { if(i < loadingMessages.length){ textEl.textContent = loadingMessages[i]; i++; } }, 1000);
-  setTimeout(() => {
-    clearInterval(timer);
-    const features = analyzeImage(loadedImage);
-    const palm = toPalmLines(features);   // 6本の線スコア
-    const result = classify(features);    // タイプ分類
-    showResult(result, palm, features);
-    goTo('screen-result');
+/* ---- 診断開始 ---- */
+const MSGS = ['生命線を見ています…','知能線と金運線を見ています…','暮らしのタイプを整えています…'];
+function startDiag(){
+  if(!img) return;
+  go('s-load');
+  const el = document.getElementById('ldtxt');
+  el.textContent = MSGS[0];
+  let i=1;
+  const t = setInterval(()=>{ if(i<MSGS.length){ el.textContent=MSGS[i]; i++; } },1000);
+  setTimeout(()=>{
+    clearInterval(t);
+    const f = analyze(img);
+    showResult(f);
+    go('s-result');
   }, 3000);
 }
 
-/* ================= 画像の簡易解析（Canvas / 外部ライブラリ不使用） =================
-   手相で金運を見るときの定番＝薬指の下の「太陽線」と小指の下の「財運線」を中心に、
-   画像の該当エリアの“縦線（縦方向の濃淡変化）”の強さを読み取る。
-   手は指が上向きで写っている前提で、手のひらの上側の3列を見る。
-     ・太陽線エリア：上側・中央寄り（薬指の下あたり）
-     ・財運線エリア：上側・端の列（小指の下あたり／左右どちらかに来るので強い方を採用）
-   さらに、感情線（手のひら中段の横線）、運命線（中央の縦線）も補助的に読む。 */
-function analyzeImage(img){
-  const canvas = document.getElementById('analyzeCanvas');
-  const ctx = canvas.getContext('2d', { willReadFrequently:true });
-  const W = 160, H = 160;
-  canvas.width = W; canvas.height = H;
-  ctx.drawImage(img, 0, 0, W, H);
-  const data = ctx.getImageData(0, 0, W, H).data;
+/* ---- 画像解析 ----
+   グローバル統計のみ。領域指定は使わない（手の向きに左右されるため）。
+   取得値：brightness, contrast, fineLines, vRatio, balance
+   分類はピクセルハッシュ主体（同一画像→同一結果、異なる画像→バラつく）。 */
+function analyze(im){
+  const cv = document.getElementById('cvs');
+  const ctx = cv.getContext('2d',{willReadFrequently:true});
+  const W=160,H=160;
+  cv.width=W; cv.height=H;
+  ctx.drawImage(im,0,0,W,H);
+  const d = ctx.getImageData(0,0,W,H).data;
 
-  // グレースケール化
-  const gray = new Float32Array(W*H);
-  let sum = 0;
-  for(let p=0; p<W*H; p++){
-    const r=data[p*4], g=data[p*4+1], b=data[p*4+2];
-    const lum = 0.299*r + 0.587*g + 0.114*b;
-    gray[p]=lum; sum+=lum;
+  const g = new Float32Array(W*H);
+  let s=0;
+  for(let p=0;p<W*H;p++){
+    const lum=0.299*d[p*4]+0.587*d[p*4+1]+0.114*d[p*4+2];
+    g[p]=lum; s+=lum;
   }
-  const brightness = sum/(W*H);
+  const brightness=s/(W*H);
 
-  // コントラスト（線のくっきり具合の目安）
-  let varSum=0;
-  for(let p=0; p<W*H; p++){ const d=gray[p]-brightness; varSum+=d*d; }
-  const contrast = Math.sqrt(varSum/(W*H));
+  let vs=0;
+  for(let p=0;p<W*H;p++){ const dv=g[p]-brightness; vs+=dv*dv; }
+  const contrast=Math.sqrt(vs/(W*H));
 
-  // 全画素の縦線・横線エッジをグローバルに集計
-  // 縦線成分：横方向の輝度差 |gray[p]-gray[p+1]|
-  // 横線成分：縦方向の輝度差 |gray[p]-gray[p+W]|
-  let vTotal=0, hTotal=0, strongEdge=0, totalCells=0;
-  for(let y=0; y<H-1; y++){
-    for(let x=0; x<W-1; x++){
-      const p=y*W+x;
-      const ve=Math.abs(gray[p]-gray[p+1]);
-      const he=Math.abs(gray[p]-gray[p+W]);
-      vTotal+=ve; hTotal+=he;
-      if(ve+he>26) strongEdge++;
-      totalCells++;
-    }
+  /* ピクセルハッシュ（分類の主信号）
+     線形合同法で全画素を混ぜる → 写真ごとに一意な整数 */
+  let hash=0x5A3F9B2D;
+  for(let p=0;p<W*H;p+=5){
+    hash=((hash^Math.round(g[p]))*1664525+1013904223)|0;
   }
-  // 縦線比率：0.5=均等, 0.6以上=縦線優位（財運線・太陽線傾向）, 0.4以下=横線優位（感情線傾向）
-  const vRatio    = vTotal / Math.max(1, vTotal+hTotal);
-  const fineLines = strongEdge / Math.max(1, totalCells);   // 細かい線の密度
 
-  // 濃淡バランス（3×3領域の明るさのばらつき＝線の流れの変化・ひらめき感の目安）
-  const regions=new Array(9).fill(0), counts=new Array(9).fill(0);
-  for(let y=0; y<H; y++) for(let x=0; x<W; x++){
-    const rx=Math.min(2,Math.floor(x/(W/3))), ry=Math.min(2,Math.floor(y/(H/3)));
-    const idx=ry*3+rx; regions[idx]+=gray[y*W+x]; counts[idx]++;
+  /* グローバルエッジ（メーター表示用） */
+  let vT=0,hT=0,strong=0,tot=0;
+  for(let y=0;y<H-1;y++) for(let x=0;x<W-1;x++){
+    const p=y*W+x;
+    const ve=Math.abs(g[p]-g[p+1]);
+    const he=Math.abs(g[p]-g[p+W]);
+    vT+=ve; hT+=he;
+    if(ve+he>26) strong++;
+    tot++;
   }
-  const means=regions.map((s,k)=>s/counts[k]);
-  const mAvg=means.reduce((a,b)=>a+b,0)/9;
-  let rv=0; means.forEach(m=>rv+=(m-mAvg)**2);
+  const vRatio=vT/Math.max(1,vT+hT);
+  const fineLines=strong/Math.max(1,tot);
+
+  /* 3×3 バランス */
+  const reg=new Array(9).fill(0),cnt=new Array(9).fill(0);
+  for(let y=0;y<H;y++) for(let x=0;x<W;x++){
+    const idx=Math.min(2,Math.floor(y/(H/3)))*3+Math.min(2,Math.floor(x/(W/3)));
+    reg[idx]+=g[y*W+x]; cnt[idx]++;
+  }
+  const rm=reg.map((v,k)=>v/cnt[k]);
+  const ra=rm.reduce((a,b)=>a+b,0)/9;
+  let rv=0; rm.forEach(m=>rv+=(m-ra)**2);
   const balance=Math.sqrt(rv/9);
 
-  // 吉相ヒント（エンタメ用・エッジ量と密度から簡易判定）
-  const kingHint  = (fineLines>0.030 && vRatio>0.54 && contrast>38);
-  const multiHint = (fineLines>0.028 && vRatio>0.52);
-  const entreHint = (fineLines>0.024 && balance>14);
+  /* 吉相フラグ（エンタメ演出用） */
+  const kingHint  = fineLines>0.028 && contrast>35 && vRatio>0.52;
+  const multiHint = fineLines>0.025 && vRatio>0.51;
+  const entreHint = fineLines>0.022 && balance>12;
 
-  return { brightness, contrast, fineLines, vRatio, balance, kingHint, multiHint, entreHint };
+  return {hash,brightness,contrast,fineLines,vRatio,balance,kingHint,multiHint,entreHint};
 }
-function clamp01(v){ return Math.max(0, Math.min(1, v)); }
 
-/* ================= 特徴量を「6本の手相線スコア」に変換 ================= */
-function toPalmLines(f){
-  // 各指標を見栄えのよいスコアに変換（手相っぽい数値感に）
-  const nFine = clamp01(f.fineLines/0.052);
-  const nClar = clamp01(f.contrast/44);
-  const nVH   = clamp01((f.vRatio-0.46)/0.12);      // 縦線優位度
-  const nBal  = clamp01(f.balance/27);
-  const scale = v => Math.round(45 + clamp01(v)*50); // 45–95%の範囲に
+/* ---- 分類 ----
+   ハッシュの下位ビットをタイプの基本決定に使い、
+   画像統計で少しだけ揺らす。
+   → 同一写真は必ず同一タイプ、写真が変わるとバラつく */
+function classify(f){
+  /* ハッシュを 0/1/2 に変換（3等分） */
+  const h = Math.abs(f.hash);
+  const base = h % 3;          // 0=A 1=B 2=C
+
+  /* 画像統計による小さなオフセット（±0.05 程度）でほんのり傾ける */
+  const nF = Math.min(1, f.fineLines/0.04);
+  const nB = Math.min(1, f.balance/20);
+  const nV = Math.min(1, Math.max(0,(f.vRatio-0.46)/0.12));
+
+  const bias = [
+    nF*0.06 + nV*0.04,          // A 寄り：細かい線・縦線
+    nB*0.06 + (1-nV)*0.04,      // B 寄り：バランスばらつき
+    (1-nF)*0.06 + (1-nV)*0.04   // C 寄り：なめらか・横線
+  ];
+
+  /* base を中心にバイアス加算して最大を選ぶ */
+  const scores = [0,1,2].map(i=>{
+    const dist = Math.min(Math.abs(i-base), 3-Math.abs(i-base));
+    return bias[i] - dist*0.15;   // 基本は hash の結果を優先
+  });
+  const best = scores.indexOf(Math.max(...scores));
+  return ['A','B','C'][best];
+}
+
+/* ---- スコア変換（メーター用） ----
+   見栄えよく 48–94 の範囲に収める。
+   ハッシュを使って写真ごとに変化させつつ、統計でも揺れる。 */
+function mkScores(f){
+  const h=Math.abs(f.hash);
+  const nF=Math.min(1,f.fineLines/0.04);
+  const nC=Math.min(1,f.contrast/44);
+  const nV=Math.min(1,Math.max(0,(f.vRatio-0.46)/0.12));
+  const nB=Math.min(1,f.balance/20);
+  // ハッシュから6つの乱数（0-1）を取り出す
+  const rng=[];
+  let hh=h;
+  for(let i=0;i<6;i++){ hh=((hh*214013+2531011)>>>0); rng.push((hh&0xFFFF)/65535); }
+  const sc=v=>Math.round(48+v*46);
   return {
-    sun:    { score:scale(nVH*0.6  + nFine*0.25 + nClar*0.15), label:'太陽線', sub:'薬指の下／お金を生み出す力・人気運' },
-    wealth: { score:scale(nFine*0.6 + nVH*0.25  + nClar*0.15), label:'財運線', sub:'小指の下／貯める力・お金の管理' },
-    fate:   { score:scale(nClar*0.5 + nBal*0.3  + nVH*0.2),    label:'運命線', sub:'手のひら中央／仕事運・継続力' },
-    head:   { score:scale(nFine*0.5 + nClar*0.3 + nVH*0.2),    label:'知能線', sub:'お金の使い方・判断傾向' },
-    heart:  { score:scale((1-nVH)*0.6 + nClar*0.25 + nFine*0.15), label:'感情線', sub:'家族や安心への意識' },
-    life:   { score:scale((1-nBal)*0.5 + nClar*0.3 + nFine*0.2),  label:'生命線', sub:'体力・生活の安定感' }
+    sun:    sc(nV*0.4+nF*0.2+rng[0]*0.4),
+    wealth: sc(nF*0.4+nC*0.2+rng[1]*0.4),
+    fate:   sc(nC*0.3+nB*0.1+rng[2]*0.6),
+    head:   sc(nF*0.3+nC*0.2+rng[3]*0.5),
+    heart:  sc((1-nV)*0.3+nB*0.1+rng[4]*0.6),
+    life:   sc((1-nB)*0.3+nC*0.1+rng[5]*0.6)
   };
 }
 
-/* ================= タイプ分類 =================
-   ■ 設計原則：各タイプの「主信号」が独立しており、
-     実写真の現実的な値域（contrast:20-50, fineLines:0.007-0.045,
-     vRatio:0.46-0.58, balance:5-22）で A/B/C がほぼ1/3ずつ出るよう
-     スケールを較正済み（モンテカルロ30000回 → A:32% B:35% C:34%）。
-   A：nFine（線の密度）主 ＋ 縦線傾向（財運・太陽線）
-   B：nBal（濃淡ばらつき）主 ＋ くっきり（ひらめき・動的）
-   C：(1-nVH)（横線・感情線傾向）主 ＋ なめらか ＋ 均一
-   ※ 明るさは使わない（写真ごとに照明で変わりすぎるため） */
-function classify(f){
-  // スケールを実写真の平均値→0.5になるよう設定
-  const nFine = clamp01(f.fineLines/0.052);          // fineLines 平均0.026 → nFine 0.5
-  const nClar = clamp01(f.contrast/44);
-  const nVH   = clamp01((f.vRatio-0.46)/0.12);       // vRatio 平均0.52 → nVH 0.5
-  const nBal  = clamp01(f.balance/27);               // balance 平均13.5 → nBal 0.5
-
-  const scoreA = nFine*0.55  + nVH*0.28    + nClar*0.17;
-  const scoreB = nBal*0.55   + nClar*0.28  + nVH*0.17;
-  const scoreC = (1-nVH)*0.55 + (1-nFine)*0.28 + (1-nBal)*0.17;
-
-  const scores={ A:scoreA, B:scoreB, C:scoreC };
-  const best=Object.keys(scores).reduce((a,b)=> scores[a]>=scores[b]?a:b);
-  return { type:best };
-}
-
-/* ================= タイプ別の表示内容 =================
-   ※ 物販や勧誘を連想させる語は本文・CTA・アドバイスに一切使わない方針。
-     節電ヒントは“今の暮らしのまま家でできること”のみに限定している。 */
-const TYPES = {
+/* ---- タイプデータ ---- */
+const TYPES={
   A:{
     name:'コツコツ蓄財', icon:'📒', tag:'TYPE A',
     catch:'手のひらに、現実をていねいに整える力が出ています。',
-    points:[
-      { ic:'🟡', t:'生命線がはっきり', d:'生活リズムが安定しやすく、毎日を地に足つけて過ごせる線です。' },
-      { ic:'🧠', t:'知能線がまっすぐ', d:'お金の使い方を現実的に判断でき、流れを整えるのが得意です。' },
-      { ic:'💰', t:'財運線に細かな線が多め', d:'コツコツ積み上げて残していく、堅実な金運の傾向が見られます。' }
+    sun:{
+      lv:['今はエネルギーをためている時期。日々の楽しみを少し増やすと線にハリが出てきそうです。',
+          'お金を生み出す力がほどよく整っています。好きなことに使うお金が運の流れをよくしてくれそう。',
+          '太陽線がくっきり。人を惹きつける魅力と楽しみへの上手なお金の使い方が出ている傾向です。']
+    },
+    wealth:{
+      lv:['これから育っていく財運線。コツコツの積み重ねが線をはっきりさせていきます。',
+          'お金を管理する力が安定して出ています。収入の流れを整えるのが得意な傾向です。',
+          '財運線がしっかり。貯める力・お金を回す力に恵まれた頼もしい傾向です。']
+    },
+    pts:[
+      {ic:'🟡',t:'生命線がはっきり',d:'生活リズムが安定しやすく、毎日を地に足つけて過ごせる線です。'},
+      {ic:'🧠',t:'知能線がまっすぐ',d:'お金の使い方を現実的に判断でき、流れを整えるのが得意です。'},
+      {ic:'💰',t:'財運線に細かな線が多め',d:'コツコツ積み上げて残していく、堅実な金運の傾向が見られます。'}
     ],
-    money:'一気に増やすより、ムダを少しずつ減らして残していく金運。毎月のお金の流れを“見える形”にすると、運が整いやすいタイプです。',
+    money:'一気に増やすより、ムダを少しずつ減らして残していく金運。毎月のお金の流れを"見える形"にすると、運が整いやすいタイプです。',
     life:'毎日の習慣を見直すのが得意。小さなムダに気づける目を持っているので、ちょっとした工夫の積み重ねが暮らしを心地よくしてくれます。',
-    saving:['毎月の電気代をメモしてみる', '使っていないコンセントをそっと抜く', '冷蔵庫を詰め込みすぎない'],
-    savingFoot:'小さなムダを見つけるのが得意なタイプです。'
+    saving:['毎月の電気代をメモしてみる','使っていないコンセントをそっと抜く','冷蔵庫を詰め込みすぎない'],
+    savingFoot:'小さなムダを見つけるのが得意なタイプです。',
+    memo:{
+      title:'コツコツ蓄財タイプの\nわが家の暮らしメモ',
+      lead:'小さなムダを見つけるのが得意なあなたへ。\n毎日少しずつ、記録と見直しを楽しみましょう。',
+      items:[
+        {ic:'📒',t:'電気代を月1回メモする',d:'先月より上がった？下がった？それだけでOK。気づきが積み重なります。'},
+        {ic:'🔌',t:'使っていないコンセントを抜く',d:'充電器の差しっぱなし。「抜けるもの探し」をゲームにしてみて。'},
+        {ic:'❄️',t:'冷蔵庫を詰め込みすぎない',d:'食材が見えると無駄が減り、開閉時間も短くなります。'},
+        {ic:'💡',t:'1か所だけ「消す習慣」をつくる',d:'トイレ、廊下など1か所から。習慣化すると自然と広がります。'}
+      ],
+      note:'記録派・見える化タイプ。「知る」ことが、お金の流れを整える第一歩です。'
+    }
   },
   B:{
     name:'直感ひらめき', icon:'✨', tag:'TYPE B',
     catch:'手のひらに、変化を楽しむしなやかさが出ています。',
-    points:[
-      { ic:'🧠', t:'知能線に角度や個性', d:'発想が柔軟で、感覚的にチャンスをつかむ力が出ている線です。' },
-      { ic:'☀️', t:'太陽線にハリ', d:'楽しみへの感度が高く、気分を上げる使い方が上手なタイプです。' },
-      { ic:'🌊', t:'線の流れに変化', d:'流れに変化があり、新しい風をうまく取り入れられる手相です。' }
+    sun:{
+      lv:['楽しみへの感度が育っている時期。好きなことに目を向けると流れが変わりそうです。',
+          '太陽線にハリが出ています。行動のエネルギーが金運を動かすタイプです。',
+          '太陽線がくっきり。人気運・成功運が出ており、楽しみへのお金の使い方が上手な傾向です。']
+    },
+    wealth:{
+      lv:['財運線はこれから伸びる段階。仕組みを作ると、自然とお金が整っていきます。',
+          '収入の流れが安定してきています。新しい工夫がお金の動きをよくしてくれそう。',
+          '財運線がしっかり。アイデアをかたちにする力がお金を引き寄せる傾向です。']
+    },
+    pts:[
+      {ic:'🧠',t:'知能線に角度や個性',d:'発想が柔軟で、感覚的にチャンスをつかむ力が出ている線です。'},
+      {ic:'☀️',t:'太陽線にハリ',d:'楽しみへの感度が高く、気分を上げる使い方が上手なタイプです。'},
+      {ic:'🌊',t:'線の流れに変化',d:'流れに変化があり、新しい風をうまく取り入れられる手相です。'}
     ],
     money:'新しい情報や工夫を上手に取り入れることで、金運が動きやすいタイプ。「我慢」よりも「楽しく続く仕組み」を見つけると、お金との相性が整います。',
-    life:'がんばる節約より、自然と続く“仕組み化”が向いています。一度決めてしまえば、あとはラクに回せるアイデアづくりが得意です。',
-    saving:['エアコンの温度を1度だけ調整する', '照明をつける場所をざっくり決める', '家電を使う時間を少しずらす'],
-    savingFoot:'楽に続く仕組みを作るのが得意なタイプです。'
+    life:'がんばる節約より、自然と続く"仕組み化"が向いています。一度決めてしまえば、あとはラクに回せるアイデアづくりが得意です。',
+    saving:['エアコンの温度を1度だけ調整する','照明をつける場所をざっくり決める','家電を使う時間を少しずらす'],
+    savingFoot:'楽に続く仕組みを作るのが得意なタイプです。',
+    memo:{
+      title:'直感ひらめきタイプの\nわが家の暮らしメモ',
+      lead:'仕組みにしてしまえば、あとは自然と続くタイプ。\nムリなく、スマートに整えていきましょう。',
+      items:[
+        {ic:'🌡️',t:'エアコンの温度設定を決めてしまう',d:'夏は28℃、冬は20℃など「マイルール」を決めると迷わず節電できます。'},
+        {ic:'💡',t:'よく使う部屋の照明だけ気にする',d:'全部気にしなくてOK。感覚で決めると自然に続きます。'},
+        {ic:'🧺',t:'洗濯・乾燥の時間をちょっとずらす',d:'朝早めか夜遅めに動かすだけ。生活リズムと合わせると自然にできます。'},
+        {ic:'🍚',t:'炊飯器の保温は早めにオフ',d:'食べ残しは冷蔵庫へ、が習慣になると楽です。'}
+      ],
+      note:'一度決めたら動く行動派。ルールを「仕組み化」すると、ほぼ自動で節電できるタイプです。'
+    }
   },
   C:{
     name:'家族安心', icon:'🏡', tag:'TYPE C',
     catch:'手のひらに、まわりを思いやるあたたかさが出ています。',
-    points:[
-      { ic:'💗', t:'感情線が大きくなめらか', d:'人を思う気持ちが強く、家族や身近な人を大切にする線です。' },
-      { ic:'🟢', t:'生命線がゆったり', d:'安定感があり、暮らしに落ち着きをもたらすタイプの手相です。' },
-      { ic:'🤝', t:'運命線がしっかり', d:'まわりとのつながりの中で、運が少しずつ整っていく傾向です。' }
+    sun:{
+      lv:['穏やかな太陽線が出ています。家族や周囲との時間が、運を育てていくタイプです。',
+          '太陽線がやわらかく広がっています。人との縁がお金の流れをよくしていく傾向です。',
+          '太陽線がしっかり。家族や仲間のために動くことで、運がよりよく整う手相です。']
+    },
+    wealth:{
+      lv:['財運線は家族を意識すると育っていく線。みんなのために使うお金が運を整えます。',
+          '財運線が安定しています。家族の安心のためのお金の使い方が運を引き寄せます。',
+          '財運線がくっきり。家族や大切な人への使い方に、お金の運が宿っている傾向です。']
+    },
+    pts:[
+      {ic:'💗',t:'感情線が大きくなめらか',d:'人を思う気持ちが強く、家族や身近な人を大切にする線です。'},
+      {ic:'🟢',t:'生命線がゆったり',d:'安定感があり、暮らしに落ち着きをもたらすタイプの手相です。'},
+      {ic:'🤝',t:'運命線がしっかり',d:'まわりとのつながりの中で、運が少しずつ整っていく傾向です。'}
     ],
     money:'自分のためだけでなく、家族の安心のために使うお金が運を整えるタイプ。みんなで話し合えるお金の使い方が、暮らしを豊かにしてくれます。',
     life:'家族みんなで取り組めることが続きやすいタイプ。一人でがんばるより、声をかけ合える小さなルールづくりが向いています。',
-    saving:['家族で電気を消す合言葉を決める', '冷蔵庫の開け閉めを少し減らす', 'リビングに集まる時間を作る'],
-    savingFoot:'みんなで続ける小さな工夫が得意なタイプです。'
+    saving:['家族で電気を消す合言葉を決める','冷蔵庫の開け閉めを少し減らす','リビングに集まる時間を作る'],
+    savingFoot:'みんなで続ける小さな工夫が得意なタイプです。',
+    memo:{
+      title:'家族安心タイプの\nわが家の暮らしメモ',
+      lead:'家族みんなで取り組むと、自然と続くタイプ。\n合言葉ひとつから、暮らしが整っていきます。',
+      items:[
+        {ic:'👨‍👩‍👧',t:'家族で「消す合言葉」を決める',d:'「最後の人がパチッ！」など、遊び感覚で決めると子どもも動いてくれます。'},
+        {ic:'🛋️',t:'リビングに集まる時間を増やす',d:'みんなが1か所に集まる時間があると自然と明かりが減ります。'},
+        {ic:'❄️',t:'冷蔵庫の開け閉めを家族で意識する',d:'「開けたらすぐ閉める」をルールに。ゲーム感覚で話し合うと続きやすい。'},
+        {ic:'🌙',t:'寝る前の「消し忘れチェック」を習慣に',d:'「誰か確認してー」と声をかけ合う文化をつくりましょう。'}
+      ],
+      note:'家族で動けるタイプ。みんなで楽しめる小さなルールが、一番長続きします。'
+    }
   }
 };
 
-/* ================= 結果画面に流し込む ================= */
-function showResult(result, palm, f){
-  lastType = result.type;   // メモ画面で参照するためタイプを保持
-  const t = TYPES[result.type];
-  document.getElementById('resultIcon').textContent = t.icon;
-  document.getElementById('resultTag').textContent  = t.tag;
-  document.getElementById('resultName').textContent = t.name;
-  document.getElementById('resultCatch').textContent = t.catch;
+/* ---- 結果表示 ---- */
+let curType='A';
 
-  // ---- 金運の2線（太陽線・財運線）を主役カードで表示 ----
-  // スコアの強さで読み解き文を出し分ける（吉相っぽく／控えめに）
-  const sunReads = [
-    '今は静かにエネルギーをためている時期。日々の楽しみを少し増やすと、線にハリが出てきそうです。',
-    'お金を生み出す力と人気運がほどよく整っています。好きなことに使うお金が、運の流れをよくしてくれそう。',
-    '太陽線がくっきり。人を惹きつける魅力と、楽しみへの上手なお金の使い方が出ている吉相の傾向です。'
-  ];
-  const wealthReads = [
-    'これから育っていく財運線。コツコツの積み重ねが、線をはっきりさせていくタイプです。',
-    'お金を管理する力が安定して出ています。収入の流れを整えるのが得意な傾向です。',
-    '財運線がしっかり。貯める力・お金を回す力に恵まれた、頼もしい吉相の傾向です。'
-  ];
-  const band = s => s>=80 ? 2 : (s>=63 ? 1 : 0);
-  const ml = document.getElementById('moneyLines');
-  ml.innerHTML = '';
-  const renderMoney = (line, reads) => `
-    <div class="money-line">
-      <div class="ml-top">
-        <span class="ml-name">${line.label}<small>${line.sub}</small></span>
-        <span class="ml-score">${line.score}<span style="font-size:13px;">点</span></span>
-      </div>
-      <div class="ml-bar"><div class="ml-fill" data-w="${line.score}"></div></div>
-      <div class="ml-read">${reads[band(line.score)]}</div>
+function showResult(f){
+  curType = classify(f);
+  const t  = TYPES[curType];
+  const sc = mkScores(f);
+
+  document.getElementById('ricon').textContent  = t.icon;
+  document.getElementById('rtag').textContent   = t.tag;
+  document.getElementById('rname').textContent  = t.name;
+  document.getElementById('rcatch').textContent = t.catch;
+
+  /* 金運2線 */
+  const band = v => v>=82?2:(v>=65?1:0);
+  const mlH  = id=>{
+    const key = id==='sun'?'sun':'wealth';
+    const lbl = id==='sun'?'太陽線':'財運線';
+    const sub = id==='sun'?'薬指の下／お金を生み出す力・人気運':'小指の下／貯める力・お金の管理';
+    const s   = sc[id];
+    const rd  = t[key].lv[band(s)];
+    return `<div class="ml">
+      <div class="ml-top"><span class="ml-name">${lbl}<small>${sub}</small></span><span class="ml-sc">${s}<span style="font-size:13px">点</span></span></div>
+      <div class="ml-bar"><div class="ml-fill" data-w="${s}"></div></div>
+      <div class="ml-read">${rd}</div>
     </div>`;
-  ml.insertAdjacentHTML('beforeend', renderMoney(palm.sun, sunReads));
-  ml.insertAdjacentHTML('beforeend', renderMoney(palm.wealth, wealthReads));
+  };
+  document.getElementById('mlines').innerHTML = mlH('sun')+mlH('wealth');
 
-  // ---- 吉相のヒント（検出されたときだけ表示） ----
-  const hints = document.getElementById('luckyHints');
-  hints.innerHTML = '';
-  const addHint = (ic, title, desc) => hints.insertAdjacentHTML('beforeend',
-    `<div class="lucky"><span class="lic">${ic}</span><span><b>${title}</b><span>${desc}</span></span></div>`);
-  if(f.kingHint)  addHint('👑','覇王線（三奇紋）の兆し','太陽線・財運線・運命線がそろって出ている、力強い金運の傾向。一代でしっかり築いていくタイプとされる吉相です。');
-  if(f.multiHint) addHint('🌟','金運線が複数の傾向','薬指の下に縦線が複数。いくつかの楽しみや収入の入り口を持ちやすい傾向が出ています。');
-  if(f.entreHint) addHint('💡','起業家線の傾向','小指の下に向かう線が出ています。自分のアイデアや工夫をお金に変えるのが上手なタイプとされます。');
+  /* 吉相 */
+  const lh = document.getElementById('lhints');
+  lh.innerHTML='';
+  if(f.kingHint)  lh.innerHTML+=`<div class="lucky"><span class="lic">👑</span><span><b>覇王線（三奇紋）の兆し</b><span>太陽線・財運線・運命線がそろって出ている、力強い金運の傾向。一代でしっかり築いていくタイプとされる吉相です。</span></span></div>`;
+  if(f.multiHint) lh.innerHTML+=`<div class="lucky"><span class="lic">🌟</span><span><b>金運線が複数の傾向</b><span>薬指の下に縦線が複数。いくつかの楽しみや入り口を持ちやすい傾向が出ています。</span></span></div>`;
+  if(f.entreHint) lh.innerHTML+=`<div class="lucky"><span class="lic">💡</span><span><b>起業家線の傾向</b><span>自分のアイデアや工夫をお金に変えるのが上手なタイプとされます。</span></span></div>`;
 
-  // 手相チャート（6本の線）
-  const chart = document.getElementById('palmChart');
-  chart.innerHTML = '';
-  Object.values(palm).forEach(l => {
-    chart.insertAdjacentHTML('beforeend', `
-      <div class="pline">
-        <div class="pline-top">
-          <span class="pline-name">${l.label}<small>${l.sub}</small></span>
-          <span class="pline-score">${l.score}%</span>
-        </div>
-        <div class="pline-bar"><div class="pline-fill" data-w="${l.score}"></div></div>
-      </div>`);
-  });
+  /* 手相チャート */
+  const lines=[
+    {key:'sun',   lbl:'太陽線', sub:'薬指の下／お金を生み出す力・人気運'},
+    {key:'wealth',lbl:'財運線', sub:'小指の下／貯める力・お金の管理'},
+    {key:'fate',  lbl:'運命線', sub:'手のひら中央／仕事運・継続力'},
+    {key:'head',  lbl:'知能線', sub:'お金の使い方・判断傾向'},
+    {key:'heart', lbl:'感情線', sub:'家族や安心への意識'},
+    {key:'life',  lbl:'生命線', sub:'体力・生活の安定感'}
+  ];
+  document.getElementById('pchart').innerHTML = lines.map(l=>`
+    <div class="pline">
+      <div class="pline-top"><span class="pline-name">${l.lbl}<small>${l.sub}</small></span><span class="pline-sc">${sc[l.key]}%</span></div>
+      <div class="pline-bar"><div class="pline-fill" data-w="${sc[l.key]}"></div></div>
+    </div>`).join('');
 
-  // 手相で見た3つのポイント
-  const pts = document.getElementById('points');
-  pts.innerHTML = '';
-  t.points.forEach(p => {
-    pts.insertAdjacentHTML('beforeend', `
-      <div class="point">
-        <span class="pic">${p.ic}</span>
-        <span class="ptext"><b>${p.t}</b><span>${p.d}</span></span>
-      </div>`);
-  });
+  /* 3ポイント */
+  document.getElementById('pts').innerHTML = t.pts.map(p=>`
+    <div class="pt"><span class="ic">${p.ic}</span><div><b>${p.t}</b><p>${p.d}</p></div></div>`).join('');
 
-  // 金運・暮らし
-  document.getElementById('moneyRead').textContent = t.money;
-  document.getElementById('lifeRead').textContent  = t.life;
+  /* テキスト */
+  document.getElementById('rmoney').textContent = t.money;
+  document.getElementById('rlife').textContent  = t.life;
+  document.getElementById('svfoot').textContent = t.savingFoot;
+  document.getElementById('svlist').innerHTML   = t.saving.map(s=>`<li>${s}</li>`).join('');
 
-  // 相性のよい暮らしの見直し（節電・控えめ）
-  const sv = document.getElementById('savingList');
-  sv.innerHTML = '';
-  t.saving.forEach(s => sv.insertAdjacentHTML('beforeend', `<li>${s}</li>`));
-  document.getElementById('savingFoot').textContent = t.savingFoot;
-
-  // バーをアニメーション（金運2線 + 手相チャート 両方）
-  requestAnimationFrame(() => {
-    document.querySelectorAll('.pline-fill, .ml-fill').forEach(el => el.style.width = el.dataset.w + '%');
+  /* バーアニメーション */
+  requestAnimationFrame(()=>{
+    document.querySelectorAll('.ml-fill,.pline-fill').forEach(el=>{ el.style.width=el.dataset.w+'%'; });
   });
 }
 
-/* ================= タイプ別「わが家の暮らしメモ」 ================= */
-let lastType = 'A';   // 最後に出たタイプを保持
-
-const MEMOS = {
-  A:{
-    title:'コツコツ蓄財タイプの\nわが家の暮らしメモ',
-    lead:'小さなムダを見つけるのが得意なあなたへ。\n毎日少しずつ、記録と見直しを楽しみましょう。',
-    items:[
-      { ic:'📒', t:'電気代を月1回メモする', d:'先月より上がった？下がった？それだけ見るだけでOK。気づきが積み重なります。' },
-      { ic:'🔌', t:'使っていないコンセントを抜く', d:'テレビの裏、充電器の差しっぱなし。「抜けるもの探し」をゲームにしてみて。' },
-      { ic:'❄️', t:'冷蔵庫を詰め込みすぎない', d:'食材が見えると無駄が減り、開閉時間も短くなります。整理整頓が金運を整えます。' },
-      { ic:'💡', t:'1か所だけ「消す習慣」をつくる', d:'トイレ、廊下、脱衣所など、まず1か所から。習慣化すると他にも広がります。' }
-    ],
-    note:'記録派・見える化タイプ。まず「知る」ことが、お金の流れを整える第一歩です。'
-  },
-  B:{
-    title:'直感ひらめきタイプの\nわが家の暮らしメモ',
-    lead:'仕組みにしてしまえば、あとは自然と続くタイプ。\nムリなく、スマートに整えていきましょう。',
-    items:[
-      { ic:'🌡️', t:'エアコンの温度設定を決めてしまう', d:'夏は28℃、冬は20℃など「マイルール」を決めると迷わず節電できます。' },
-      { ic:'💡', t:'よく使う部屋の照明だけ気にする', d:'全部気にしなくてOK。「リビングだけは電球色でゆったり」など感覚で決めて。' },
-      { ic:'🧺', t:'洗濯・乾燥の時間をちょっとずらす', d:'朝早めか夜遅めに動かすだけ。生活リズムと合わせると自然にできます。' },
-      { ic:'🍚', t:'炊飯器の保温は早めにオフ', d:'保温3時間以上はもったいないことも。食べ残しは冷蔵庫へ、が習慣になると楽。' }
-    ],
-    note:'一度決めたら動く行動派。ルールを「仕組み化」すると、ほぼ自動で節電できるタイプです。'
-  },
-  C:{
-    title:'家族安心タイプの\nわが家の暮らしメモ',
-    lead:'家族みんなで取り組むと、自然と続くタイプ。\n合言葉ひとつから、暮らしが整っていきます。',
-    items:[
-      { ic:'👨‍👩‍👧', t:'家族で「消す合言葉」を決める', d:'「最後の人がパチッ！」など、遊び感覚で決めると子どもも動いてくれます。' },
-      { ic:'🛋️', t:'リビングに集まる時間を増やす', d:'バラバラに過ごすより、みんなが1か所に集まる時間があると自然と明かりが減ります。' },
-      { ic:'❄️', t:'冷蔵庫の開け閉めを家族で意識する', d:'「開けたらすぐ閉める」をルールに。ゲーム感覚で話し合うと続きやすいです。' },
-      { ic:'🌙', t:'寝る前の「消し忘れチェック」を習慣に', d:'ひとりが見て回るより、「誰か確認してー」と声をかけ合う文化をつくりましょう。' }
-    ],
-    note:'家族で動けるタイプ。みんなで楽しめる小さなルールが、一番長続きします。'
-  }
-};
-
-function renderMemo(type){
-  const m = MEMOS[type];
-  const rows = m.items.map(i =>
-    `<div class="memo-row"><span class="ic">${i.ic}</span><span><b>${i.t}</b><br>${i.d}</span></div>`
-  ).join('');
-  document.getElementById('memoContent').innerHTML = `
-    <h1 style="font-size:20px; white-space:pre-line;">${m.title}</h1>
-    <p class="lead" style="margin-top:14px; white-space:pre-line;">${m.lead}</p>
-    ${rows}
-    <div class="note" style="margin-top:24px;">${m.note}</div>`;
+/* ---- 暮らしメモ ---- */
+function renderMemo(){
+  const m = TYPES[curType].memo;
+  document.getElementById('memocnt').innerHTML=`
+    <h1 style="font-size:20px;white-space:pre-line">${m.title}</h1>
+    <p class="lead" style="margin-top:14px;white-space:pre-line">${m.lead}</p>
+    ${m.items.map(i=>`<div class="mr"><span class="ic">${i.ic}</span><span><b>${i.t}</b>${i.d}</span></div>`).join('')}
+    <div class="note" style="margin-top:22px">${m.note}</div>`;
 }
 
-/* ================= やり直し ================= */
-function resetAll(){
-  loadedImage = null;
-  document.getElementById('fileInputCamera').value = '';
-  document.getElementById('fileInputAlbum').value  = '';
-  diagnoseBtn.disabled = true;
-  diagnoseBtn.style.opacity = '.5';
-  previewBox.innerHTML = '<div class="preview-placeholder"><span class="big">📷</span>ここに手のひらの写真が表示されます</div>';
-  goTo('screen-top');
+/* ---- リセット ---- */
+function reset(){
+  img=null; fi.value=''; dbtn.disabled=true;
+  prev.innerHTML='<div class="prev-ph"><span class="big">📷</span>ここに手のひらの写真が表示されます</div>';
+  go('s-top');
 }
 </script>
 </body>
