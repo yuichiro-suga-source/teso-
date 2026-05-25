@@ -162,9 +162,9 @@ h1 .ac{color:var(--gold-d)}
     <div class="prev" id="prev">
       <div class="prev-ph"><span class="big">📷</span>ここに手のひらの写真が表示されます</div>
     </div>
-    <!-- accept="image/*" のみ。captureなしで iOS/Android ともカメラ＆アルバム選択可 -->
+    <!-- capture不使用。iOS/Androidともにタップで「写真を撮る」が選べるOS標準シートが出る -->
     <input type="file" id="fi" accept="image/*" style="display:none">
-    <label for="fi" class="btn btn-gold" style="text-align:center;margin-top:18px">📷 写真を撮る / 選ぶ</label>
+    <label for="fi" class="btn btn-gold" style="text-align:center;margin-top:18px">📷 手のひらを撮影する</label>
     <button class="btn btn-green" id="dbtn" onclick="startDiag()" disabled>この手のひらを診断する</button>
   </div>
   <p class="foot">手のひらを画面いっぱいに、影が入らないように撮ると<br>きれいに読み取れます。</p>
