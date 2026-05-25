@@ -63,7 +63,7 @@
   .preview-box img{ width:100%; display:block; }
   .preview-placeholder{ padding:40px 20px; }
   .preview-placeholder .big{ font-size:34px; display:block; margin-bottom:8px; }
-  #fileInput{ display:none; }
+  /* file inputs は各要素にインラインで display:none を指定済み */
 
   /* 診断中 */
   .loading-wrap{ text-align:center; padding:60px 0 40px; }
@@ -164,10 +164,21 @@
     <div class="card">
       <p class="upload-hint">明るい場所で、手のひら全体が<br>写るように撮影してください。</p>
       <div class="preview-box" id="previewBox">
-        <div class="preview-placeholder" id="previewPlaceholder"><span class="big">📷</span>ここに手のひらの写真が表示されます</div>
+        <div class="preview-placeholder"><span class="big">📷</span>ここに手のひらの写真が表示されます</div>
       </div>
-      <input type="file" id="fileInput" accept="image/*" capture="environment">
-      <label for="fileInput" class="btn btn-ghost" style="text-align:center;">写真を選ぶ</label>
+
+      <!-- カメラ起動（capture属性あり）-->
+      <input type="file" id="fileInputCamera" accept="image/*" capture="environment" style="display:none">
+      <!-- アルバム選択（capture属性なし＝ギャラリー）-->
+      <input type="file" id="fileInputAlbum"  accept="image/*" style="display:none">
+
+      <label for="fileInputCamera" class="btn btn-primary" style="text-align:center;">📷 カメラで撮影する</label>
+      <label for="fileInputAlbum"  class="btn btn-ghost"   style="text-align:center;">🖼 アルバムから選ぶ</label>
+
+      <button class="btn btn-green" id="diagnoseBtn" onclick="startDiagnose()" disabled style="opacity:.5;">この手のひらを診断する</button>
+    </div>
+    <p class="foot">手のひらを画面いっぱいに、影が入らないように撮ると、<br>線がきれいに読み取れます。</p>
+  </section>
       <button class="btn btn-primary" id="diagnoseBtn" onclick="startDiagnose()" disabled style="opacity:.5;">診断する</button>
     </div>
     <p class="foot">手のひらを画面いっぱいに、影が入らないように撮ると、<br>線がきれいに読み取れます。</p>
@@ -254,24 +265,26 @@ function goTo(id){
 }
 
 /* ================= 画像読み込み＆プレビュー ================= */
-const fileInput = document.getElementById('fileInput');
-const previewBox = document.getElementById('previewBox');
+const previewBox  = document.getElementById('previewBox');
 const diagnoseBtn = document.getElementById('diagnoseBtn');
-let loadedImage = null;
+let loadedImage   = null;
 
-fileInput.addEventListener('change', (e) => {
+// カメラ・アルバム、どちらのinputが変化しても同じ処理
+function onFileSelected(e){
   const file = e.target.files[0];
   if(!file) return;
   const reader = new FileReader();
   reader.onload = (ev) => {
-    previewBox.innerHTML = '<img id="previewImg" alt="手のひらプレビュー">';
+    previewBox.innerHTML = '<img id="previewImg" alt="手のひらプレビュー" style="width:100%;display:block;">';
     document.getElementById('previewImg').src = ev.target.result;
     loadedImage = new Image();
     loadedImage.onload = () => { diagnoseBtn.disabled = false; diagnoseBtn.style.opacity = '1'; };
     loadedImage.src = ev.target.result;
   };
   reader.readAsDataURL(file);
-});
+}
+document.getElementById('fileInputCamera').addEventListener('change', onFileSelected);
+document.getElementById('fileInputAlbum').addEventListener('change',  onFileSelected);
 
 /* ================= 診断中演出（文言変更） ================= */
 const loadingMessages = [
@@ -592,7 +605,8 @@ function renderMemo(type){
 /* ================= やり直し ================= */
 function resetAll(){
   loadedImage = null;
-  fileInput.value = '';
+  document.getElementById('fileInputCamera').value = '';
+  document.getElementById('fileInputAlbum').value  = '';
   diagnoseBtn.disabled = true;
   diagnoseBtn.style.opacity = '.5';
   previewBox.innerHTML = '<div class="preview-placeholder"><span class="big">📷</span>ここに手のひらの写真が表示されます</div>';
