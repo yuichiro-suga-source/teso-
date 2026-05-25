@@ -228,24 +228,16 @@
       <!-- 6. 電気代の案内（最下部に小さく・弱め） -->
       <div class="bill-note">診断日がある方は、最近の電気代をなんとなく見ておくと、<br>暮らしのクセが見つけやすくなります。</div>
 
-      <button class="btn btn-primary" onclick="goTo('screen-memo')">わが家の暮らしメモを見る</button>
+      <button class="btn btn-primary" onclick="renderMemo(lastType); goTo('screen-memo')">わが家の暮らしメモを見る</button>
       <button class="btn btn-ghost" onclick="resetAll()">もう一度診断する</button>
     </div>
   </section>
 
-  <!-- ========== 画面5：わが家の暮らしメモ（読みもの） ========== -->
+  <!-- ========== 画面5：わが家の暮らしメモ（タイプ別） ========== -->
   <section id="screen-memo" class="screen">
     <div class="card">
-      <h1 style="font-size:21px;">わが家の<br>暮らしメモ</h1>
-      <p class="lead" style="margin-top:14px;">今日からそのままできる、<br>金運アップ風のちいさな習慣です。</p>
-      <div class="memo-row"><span class="ic">💡</span><span><b>こまめに消す合言葉</b><br>「最後の人がパチッ」を家族のルールに。続けると気持ちもすっきり。</span></div>
-      <div class="memo-row"><span class="ic">❄️</span><span><b>冷蔵庫はゆったり</b><br>詰め込みすぎず、開け閉めはサッと。中が見やすいと家事もラクに。</span></div>
-      <div class="memo-row"><span class="ic">🌡️</span><span><b>エアコンは1度だけ</b><br>夏は1度上げ、冬は1度下げる。無理のない範囲で心地よく。</span></div>
-      <div class="memo-row"><span class="ic">🔌</span><span><b>使わない待機を見直す</b><br>長く使わない家電は、そっとお休みさせてあげましょう。</span></div>
-      <div class="memo-row"><span class="ic">🧺</span><span><b>家事の時間をずらす</b><br>洗濯や乾燥の時間を少しずらすと、暮らしのリズムも整います。</span></div>
-      <div class="memo-row"><span class="ic">👨‍👩‍👧</span><span><b>家族で集まる時間</b><br>同じ部屋で過ごす時間が増えると、自然と居心地もよくなります。</span></div>
-      <div class="note" style="margin-top:24px;">どれも今の暮らしのままできることばかり。気が向いたものから、ゆるく試してみてください。</div>
-      <button class="btn btn-primary" onclick="goTo('screen-result')">結果画面にもどる</button>
+      <div id="memoContent"></div>
+      <button class="btn btn-primary" onclick="goTo('screen-result')" style="margin-top:28px;">結果画面にもどる</button>
       <button class="btn btn-ghost" onclick="resetAll()">もう一度診断する</button>
     </div>
   </section>
@@ -479,6 +471,7 @@ const TYPES = {
 
 /* ================= 結果画面に流し込む ================= */
 function showResult(result, palm, f){
+  lastType = result.type;   // メモ画面で参照するためタイプを保持
   const t = TYPES[result.type];
   document.getElementById('resultIcon').textContent = t.icon;
   document.getElementById('resultTag').textContent  = t.tag;
@@ -560,6 +553,57 @@ function showResult(result, palm, f){
   requestAnimationFrame(() => {
     document.querySelectorAll('.pline-fill, .ml-fill').forEach(el => el.style.width = el.dataset.w + '%');
   });
+}
+
+/* ================= タイプ別「わが家の暮らしメモ」 ================= */
+let lastType = 'A';   // 最後に出たタイプを保持
+
+const MEMOS = {
+  A:{
+    title:'コツコツ蓄財タイプの\nわが家の暮らしメモ',
+    lead:'小さなムダを見つけるのが得意なあなたへ。\n毎日少しずつ、記録と見直しを楽しみましょう。',
+    items:[
+      { ic:'📒', t:'電気代を月1回メモする', d:'先月より上がった？下がった？それだけ見るだけでOK。気づきが積み重なります。' },
+      { ic:'🔌', t:'使っていないコンセントを抜く', d:'テレビの裏、充電器の差しっぱなし。「抜けるもの探し」をゲームにしてみて。' },
+      { ic:'❄️', t:'冷蔵庫を詰め込みすぎない', d:'食材が見えると無駄が減り、開閉時間も短くなります。整理整頓が金運を整えます。' },
+      { ic:'💡', t:'1か所だけ「消す習慣」をつくる', d:'トイレ、廊下、脱衣所など、まず1か所から。習慣化すると他にも広がります。' }
+    ],
+    note:'記録派・見える化タイプ。まず「知る」ことが、お金の流れを整える第一歩です。'
+  },
+  B:{
+    title:'直感ひらめきタイプの\nわが家の暮らしメモ',
+    lead:'仕組みにしてしまえば、あとは自然と続くタイプ。\nムリなく、スマートに整えていきましょう。',
+    items:[
+      { ic:'🌡️', t:'エアコンの温度設定を決めてしまう', d:'夏は28℃、冬は20℃など「マイルール」を決めると迷わず節電できます。' },
+      { ic:'💡', t:'よく使う部屋の照明だけ気にする', d:'全部気にしなくてOK。「リビングだけは電球色でゆったり」など感覚で決めて。' },
+      { ic:'🧺', t:'洗濯・乾燥の時間をちょっとずらす', d:'朝早めか夜遅めに動かすだけ。生活リズムと合わせると自然にできます。' },
+      { ic:'🍚', t:'炊飯器の保温は早めにオフ', d:'保温3時間以上はもったいないことも。食べ残しは冷蔵庫へ、が習慣になると楽。' }
+    ],
+    note:'一度決めたら動く行動派。ルールを「仕組み化」すると、ほぼ自動で節電できるタイプです。'
+  },
+  C:{
+    title:'家族安心タイプの\nわが家の暮らしメモ',
+    lead:'家族みんなで取り組むと、自然と続くタイプ。\n合言葉ひとつから、暮らしが整っていきます。',
+    items:[
+      { ic:'👨‍👩‍👧', t:'家族で「消す合言葉」を決める', d:'「最後の人がパチッ！」など、遊び感覚で決めると子どもも動いてくれます。' },
+      { ic:'🛋️', t:'リビングに集まる時間を増やす', d:'バラバラに過ごすより、みんなが1か所に集まる時間があると自然と明かりが減ります。' },
+      { ic:'❄️', t:'冷蔵庫の開け閉めを家族で意識する', d:'「開けたらすぐ閉める」をルールに。ゲーム感覚で話し合うと続きやすいです。' },
+      { ic:'🌙', t:'寝る前の「消し忘れチェック」を習慣に', d:'ひとりが見て回るより、「誰か確認してー」と声をかけ合う文化をつくりましょう。' }
+    ],
+    note:'家族で動けるタイプ。みんなで楽しめる小さなルールが、一番長続きします。'
+  }
+};
+
+function renderMemo(type){
+  const m = MEMOS[type];
+  const rows = m.items.map(i =>
+    `<div class="memo-row"><span class="ic">${i.ic}</span><span><b>${i.t}</b><br>${i.d}</span></div>`
+  ).join('');
+  document.getElementById('memoContent').innerHTML = `
+    <h1 style="font-size:20px; white-space:pre-line;">${m.title}</h1>
+    <p class="lead" style="margin-top:14px; white-space:pre-line;">${m.lead}</p>
+    ${rows}
+    <div class="note" style="margin-top:24px;">${m.note}</div>`;
 }
 
 /* ================= やり直し ================= */
