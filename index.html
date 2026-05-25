@@ -85,6 +85,22 @@
 
   /* 手相チャート（6本の線） */
   .palm-chart{ margin-top:6px; }
+
+  /* 金運2線（太陽線・財運線）の大きめカード */
+  .money-line{ background:linear-gradient(180deg,#fffdf5,#fbf4e0); border:1px solid rgba(200,162,75,.3); border-radius:18px; padding:18px 18px; margin-top:14px; }
+  .money-line .ml-top{ display:flex; align-items:baseline; justify-content:space-between; }
+  .money-line .ml-name{ font-family:"Shippori Mincho", serif; font-size:19px; font-weight:700; color:var(--gold-deep); }
+  .money-line .ml-name small{ display:block; font-family:"Zen Maru Gothic",sans-serif; font-weight:400; font-size:12.5px; color:var(--ink-soft); margin-top:2px; }
+  .money-line .ml-score{ font-size:22px; font-weight:700; color:var(--gold-deep); }
+  .money-line .ml-bar{ height:13px; border-radius:13px; background:#fff; box-shadow:inset 0 0 0 1px rgba(200,162,75,.25); overflow:hidden; margin-top:10px; }
+  .money-line .ml-fill{ height:100%; border-radius:13px; background:linear-gradient(90deg,var(--green),var(--gold)); width:0%; transition:width 1.2s cubic-bezier(.2,.8,.2,1); }
+  .money-line .ml-read{ font-size:15px; line-height:1.85; margin-top:12px; }
+
+  /* 吉相ヒント */
+  .lucky{ background:#fff7e6; border:1px solid rgba(200,162,75,.4); border-radius:16px; padding:14px 16px; margin-top:14px; display:flex; gap:12px; align-items:flex-start; }
+  .lucky .lic{ flex:0 0 30px; font-size:24px; line-height:1.3; }
+  .lucky b{ display:block; font-size:16px; color:var(--gold-deep); margin-bottom:3px; }
+  .lucky span{ font-size:14px; line-height:1.8; }
   .pline{ margin-top:20px; }
   .pline-top{ display:flex; justify-content:space-between; align-items:baseline; }
   .pline-name{ font-weight:700; font-size:17px; }
@@ -176,6 +192,13 @@
       <div class="result-type" id="resultTag">YOUR TYPE</div>
       <div class="result-title">あなたは<span id="resultName">〇〇</span>タイプ</div>
       <p class="result-catch" id="resultCatch"></p>
+
+      <!-- ★金運の2線（太陽線・財運線）を主役に ★ -->
+      <div class="sec-head"><span class="num">💰</span>金運を見る2つの線</div>
+      <p class="sec-body" style="margin:0 0 4px; font-size:14.5px; color:var(--ink-soft);">手相で金運を見るときの定番、<b>薬指の下の「太陽線」</b>と<b>小指の下の「財運線」</b>を読み解きました。</p>
+      <div id="moneyLines"></div>
+      <!-- 吉相のヒント（出たときだけ表示） -->
+      <div id="luckyHints"></div>
 
       <!-- 手相チャート（6本の線） -->
       <div class="sec-head"><span class="num">手</span>あなたの手相に出ていた線</div>
@@ -276,14 +299,18 @@ function startDiagnose(){
     const features = analyzeImage(loadedImage);
     const palm = toPalmLines(features);   // 6本の線スコア
     const result = classify(features);    // タイプ分類
-    showResult(result, palm);
+    showResult(result, palm, features);
     goTo('screen-result');
   }, 3000);
 }
 
 /* ================= 画像の簡易解析（Canvas / 外部ライブラリ不使用） =================
-   明るさ・コントラスト・エッジ量・線の多さ・中央付近の線・濃淡バランスを取得。
-   グレースケール化 → 簡易エッジ検出。 */
+   手相で金運を見るときの定番＝薬指の下の「太陽線」と小指の下の「財運線」を中心に、
+   画像の該当エリアの“縦線（縦方向の濃淡変化）”の強さを読み取る。
+   手は指が上向きで写っている前提で、手のひらの上側の3列を見る。
+     ・太陽線エリア：上側・中央寄り（薬指の下あたり）
+     ・財運線エリア：上側・端の列（小指の下あたり／左右どちらかに来るので強い方を採用）
+   さらに、感情線（手のひら中段の横線）、運命線（中央の縦線）も補助的に読む。 */
 function analyzeImage(img){
   const canvas = document.getElementById('analyzeCanvas');
   const ctx = canvas.getContext('2d', { willReadFrequently:true });
@@ -292,6 +319,7 @@ function analyzeImage(img){
   ctx.drawImage(img, 0, 0, W, H);
   const data = ctx.getImageData(0, 0, W, H).data;
 
+  // グレースケール化
   const gray = new Float32Array(W*H);
   let sum = 0;
   for(let p=0; p<W*H; p++){
@@ -301,64 +329,104 @@ function analyzeImage(img){
   }
   const brightness = sum/(W*H);
 
+  // コントラスト（線のくっきり具合の目安）
   let varSum=0;
   for(let p=0; p<W*H; p++){ const d=gray[p]-brightness; varSum+=d*d; }
   const contrast = Math.sqrt(varSum/(W*H));
 
-  let edgeSum=0, strongEdge=0, centerEdgeSum=0, centerCount=0;
-  const STRONG=28;
+  // 縦線の強さ＝横方向の勾配 |gray[p]-gray[p+1]|（縦に走る手相線で大きくなる）
+  // 横線の強さ＝縦方向の勾配 |gray[p]-gray[p+W]|（感情線・知能線など横線で大きくなる）
+  // エリアごとに縦線/横線を集計する
+  const acc = { sunV:0,sunN:0, wL_V:0,wL_N:0, wR_V:0,wR_N:0, ctrV:0,ctrN:0, midH:0,midN:0 };
+  let strongEdge=0, totalCells=0;
+
   for(let y=0; y<H-1; y++){
+    const fy = y/H;                         // 0=上（指側） 〜 1=下（手首側）
     for(let x=0; x<W-1; x++){
-      const p=y*W+x;
-      const gx=Math.abs(gray[p]-gray[p+1]);
-      const gy=Math.abs(gray[p]-gray[p+W]);
-      const mag=gx+gy;
-      edgeSum+=mag;
-      if(mag>STRONG) strongEdge++;
-      if(x>W*0.3 && x<W*0.7 && y>H*0.3 && y<H*0.7){ centerEdgeSum+=mag; centerCount++; }
+      const fx = x/W;                        // 0=左端 〜 1=右端
+      const p = y*W+x;
+      const vEdge = Math.abs(gray[p]-gray[p+1]);   // 縦線成分
+      const hEdge = Math.abs(gray[p]-gray[p+W]);   // 横線成分
+
+      // 強い線（縦横どちらか）の総量＝細かい線の多さ
+      if(vEdge+hEdge > 26) strongEdge++;
+      totalCells++;
+
+      // ---- 上側エリア（指の付け根あたり：fy 0.12〜0.50）の縦線を金運線として集計 ----
+      if(fy>0.12 && fy<0.50){
+        if(fx>0.35 && fx<0.65){ acc.sunV+=vEdge; acc.sunN++; }       // 太陽線（中央寄り）
+        if(fx<=0.30)          { acc.wL_V+=vEdge; acc.wL_N++; }        // 左端列（財運線候補）
+        if(fx>=0.70)          { acc.wR_V+=vEdge; acc.wR_N++; }        // 右端列（財運線候補）
+      }
+      // ---- 中央の縦線（運命線）：中央列を上〜中段で ----
+      if(fx>0.40 && fx<0.60 && fy>0.20 && fy<0.80){ acc.ctrV+=vEdge; acc.ctrN++; }
+      // ---- 手のひら中段の横線（感情線・知能線）：fy 0.45〜0.75 ----
+      if(fy>0.45 && fy<0.75 && fx>0.15 && fx<0.85){ acc.midH+=hEdge; acc.midN++; }
     }
   }
-  const edge=edgeSum/(W*H);
-  const lineCount=strongEdge/(W*H);
-  const centerEdge=centerEdgeSum/Math.max(1,centerCount);
 
+  const sunV     = acc.sunV/Math.max(1,acc.sunN);                 // 太陽線エリアの縦線強度
+  const wealthL  = acc.wL_V/Math.max(1,acc.wL_N);
+  const wealthR  = acc.wR_V/Math.max(1,acc.wR_N);
+  const wealthV  = Math.max(wealthL, wealthR);                    // 財運線（小指側＝端の強い方）
+  const centerV  = acc.ctrV/Math.max(1,acc.ctrN);                // 運命線（中央の縦線）
+  const emotionH = acc.midH/Math.max(1,acc.midN);                // 感情線（中段の横線）
+  const fineLines= strongEdge/Math.max(1,totalCells);            // 細かい線の多さ
+
+  // 濃淡バランス（3×3領域の明るさのばらつき＝線の流れの変化の目安）
   const regions=new Array(9).fill(0), counts=new Array(9).fill(0);
   for(let y=0; y<H; y++) for(let x=0; x<W; x++){
     const rx=Math.min(2,Math.floor(x/(W/3))), ry=Math.min(2,Math.floor(y/(H/3)));
     const idx=ry*3+rx; regions[idx]+=gray[y*W+x]; counts[idx]++;
   }
   const means=regions.map((s,k)=>s/counts[k]);
-  const avg=means.reduce((a,b)=>a+b,0)/9;
-  let rv=0; means.forEach(m=>rv+=(m-avg)**2);
+  const mAvg=means.reduce((a,b)=>a+b,0)/9;
+  let rv=0; means.forEach(m=>rv+=(m-mAvg)**2);
   const balance=Math.sqrt(rv/9);
 
-  return { brightness, contrast, edge, lineCount, centerEdge, balance };
+  // ---- 吉相のヒント（エンタメ用の簡易判定） ----
+  // 覇王線（三奇紋）：太陽線・財運線・運命線がそろって強いとき
+  const kingHint  = (sunV>11 && wealthV>11 && centerV>10);
+  // 複数の金運線：太陽線エリアが強く、細かい縦線も多いとき
+  const multiHint = (sunV>10 && fineLines>0.028);
+  // 起業家線：財運線（小指側）が強く、細かい線も出ているとき
+  const entreHint = (wealthV>11 && fineLines>0.024);
+
+  return { brightness, contrast, fineLines, sunV, wealthV, centerV, emotionH, balance, kingHint, multiHint, entreHint };
 }
 function clamp01(v){ return Math.max(0, Math.min(1, v)); }
 
-/* ================= 特徴量を「6本の手相線スコア」に変換 ================= */
+/* ================= 特徴量を「6本の手相線スコア」に変換 =================
+   太陽線・財運線は該当エリアの実測値をそのまま反映する。 */
 function toPalmLines(f){
-  const nC=clamp01(f.contrast/70), nE=clamp01(f.edge/40), nL=clamp01(f.lineCount/0.20);
-  const nB=clamp01(f.brightness/220), nBal=clamp01(f.balance/45), nCe=clamp01(f.centerEdge/40);
+  const nSun=clamp01(f.sunV/15), nWealth=clamp01(f.wealthV/15), nCtr=clamp01(f.centerV/15);
+  const nEmo=clamp01(f.emotionH/15), nFine=clamp01(f.fineLines/0.045);
+  const nClar=clamp01(f.contrast/60), nBal=clamp01(f.balance/32);
   const scale=v=>Math.round(45 + clamp01(v)*50);  // 見栄えのため45–95%に
   return {
-    life:   { score:scale(nB*0.6 + (1-nBal)*0.4), label:'生命線', sub:'体力・生活の安定感' },
-    head:   { score:scale(nE*0.5 + nL*0.5),       label:'知能線', sub:'お金の使い方・判断傾向' },
-    heart:  { score:scale((1-nL)*0.6 + nB*0.4),   label:'感情線', sub:'家族や安心への意識' },
-    fate:   { score:scale(nCe*0.7 + nC*0.3),      label:'運命線', sub:'仕事運・継続力' },
-    sun:    { score:scale(nC*0.6 + nBal*0.4),     label:'太陽線', sub:'人気運・楽しみへのお金の使い方' },
-    wealth: { score:scale(nL*0.7 + nE*0.3),       label:'財運線', sub:'貯め方・増やし方の傾向' }
+    sun:    { score:scale(nSun),                    label:'太陽線', sub:'薬指の下／お金を生み出す力・人気運' },
+    wealth: { score:scale(nWealth),                 label:'財運線', sub:'小指の下／貯める力・お金の管理' },
+    fate:   { score:scale(nCtr*0.8 + nClar*0.2),    label:'運命線', sub:'手のひら中央／仕事運・継続力' },
+    head:   { score:scale(nFine*0.6 + nClar*0.4),   label:'知能線', sub:'お金の使い方・判断傾向' },
+    heart:  { score:scale(nEmo),                    label:'感情線', sub:'家族や安心への意識' },
+    life:   { score:scale((1-nBal)*0.6 + 0.4*clamp01(f.brightness/200)), label:'生命線', sub:'体力・生活の安定感' }
   };
 }
 
-/* ================= タイプ分類（解析スコアに基づく） ================= */
+/* ================= タイプ分類（金運の2線を中心に判定） =================
+   ※ 明るさは使わない（手のひら写真は基本的に明るく、偏りの原因になるため）。
+   A コツコツ蓄財 ：財運線が強い＋細かい線が多い＋くっきり（管理・蓄財）
+   B 直感ひらめき ：太陽線が強い＋メリハリ＋線の流れの変化（成功・ひらめき）
+   C 家族安心    ：感情線（横線）が強い＋運命線が安定＋線がなめらか（家族・安心） */
 function classify(f){
-  const nC=clamp01(f.contrast/70), nE=clamp01(f.edge/40), nL=clamp01(f.lineCount/0.20);
-  const nB=clamp01(f.brightness/220), nBal=clamp01(f.balance/45), nCe=clamp01(f.centerEdge/40);
-  const scoreA = nL*0.4 + nE*0.35 + nC*0.25;
-  const scoreB = nBal*0.45 + nC*0.25 + nCe*0.30;
-  const midEdge = 1 - Math.abs(nE-0.5)*2;
-  const scoreC = nB*0.5 + clamp01(midEdge)*0.3 + (1-nL)*0.2;
+  const nSun=clamp01(f.sunV/15), nWealth=clamp01(f.wealthV/15), nCtr=clamp01(f.centerV/15);
+  const nEmo=clamp01(f.emotionH/15), nFine=clamp01(f.fineLines/0.045);
+  const nClar=clamp01(f.contrast/60), nBal=clamp01(f.balance/32);
+
+  const scoreA = nWealth*0.52 + nFine*0.32 + nClar*0.16;
+  const scoreB = nSun*0.50    + nClar*0.22 + nBal*0.28;
+  const scoreC = nEmo*0.50    + nCtr*0.32  + (1-nFine)*0.18;
+
   const scores={ A:scoreA, B:scoreB, C:scoreC };
   const best=Object.keys(scores).reduce((a,b)=> scores[a]>=scores[b]?a:b);
   return { type:best };
@@ -410,12 +478,48 @@ const TYPES = {
 };
 
 /* ================= 結果画面に流し込む ================= */
-function showResult(result, palm){
+function showResult(result, palm, f){
   const t = TYPES[result.type];
   document.getElementById('resultIcon').textContent = t.icon;
   document.getElementById('resultTag').textContent  = t.tag;
   document.getElementById('resultName').textContent = t.name;
   document.getElementById('resultCatch').textContent = t.catch;
+
+  // ---- 金運の2線（太陽線・財運線）を主役カードで表示 ----
+  // スコアの強さで読み解き文を出し分ける（吉相っぽく／控えめに）
+  const sunReads = [
+    '今は静かにエネルギーをためている時期。日々の楽しみを少し増やすと、線にハリが出てきそうです。',
+    'お金を生み出す力と人気運がほどよく整っています。好きなことに使うお金が、運の流れをよくしてくれそう。',
+    '太陽線がくっきり。人を惹きつける魅力と、楽しみへの上手なお金の使い方が出ている吉相の傾向です。'
+  ];
+  const wealthReads = [
+    'これから育っていく財運線。コツコツの積み重ねが、線をはっきりさせていくタイプです。',
+    'お金を管理する力が安定して出ています。収入の流れを整えるのが得意な傾向です。',
+    '財運線がしっかり。貯める力・お金を回す力に恵まれた、頼もしい吉相の傾向です。'
+  ];
+  const band = s => s>=80 ? 2 : (s>=63 ? 1 : 0);
+  const ml = document.getElementById('moneyLines');
+  ml.innerHTML = '';
+  const renderMoney = (line, reads) => `
+    <div class="money-line">
+      <div class="ml-top">
+        <span class="ml-name">${line.label}<small>${line.sub}</small></span>
+        <span class="ml-score">${line.score}<span style="font-size:13px;">点</span></span>
+      </div>
+      <div class="ml-bar"><div class="ml-fill" data-w="${line.score}"></div></div>
+      <div class="ml-read">${reads[band(line.score)]}</div>
+    </div>`;
+  ml.insertAdjacentHTML('beforeend', renderMoney(palm.sun, sunReads));
+  ml.insertAdjacentHTML('beforeend', renderMoney(palm.wealth, wealthReads));
+
+  // ---- 吉相のヒント（検出されたときだけ表示） ----
+  const hints = document.getElementById('luckyHints');
+  hints.innerHTML = '';
+  const addHint = (ic, title, desc) => hints.insertAdjacentHTML('beforeend',
+    `<div class="lucky"><span class="lic">${ic}</span><span><b>${title}</b><span>${desc}</span></span></div>`);
+  if(f.kingHint)  addHint('👑','覇王線（三奇紋）の兆し','太陽線・財運線・運命線がそろって出ている、力強い金運の傾向。一代でしっかり築いていくタイプとされる吉相です。');
+  if(f.multiHint) addHint('🌟','金運線が複数の傾向','薬指の下に縦線が複数。いくつかの楽しみや収入の入り口を持ちやすい傾向が出ています。');
+  if(f.entreHint) addHint('💡','起業家線の傾向','小指の下に向かう線が出ています。自分のアイデアや工夫をお金に変えるのが上手なタイプとされます。');
 
   // 手相チャート（6本の線）
   const chart = document.getElementById('palmChart');
@@ -452,9 +556,9 @@ function showResult(result, palm){
   t.saving.forEach(s => sv.insertAdjacentHTML('beforeend', `<li>${s}</li>`));
   document.getElementById('savingFoot').textContent = t.savingFoot;
 
-  // バーをアニメーション
+  // バーをアニメーション（金運2線 + 手相チャート 両方）
   requestAnimationFrame(() => {
-    document.querySelectorAll('.pline-fill').forEach(el => el.style.width = el.dataset.w + '%');
+    document.querySelectorAll('.pline-fill, .ml-fill').forEach(el => el.style.width = el.dataset.w + '%');
   });
 }
 
