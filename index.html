@@ -131,6 +131,16 @@ h1 .ac{color:var(--gold-d)}
 .mr .ic{flex:0 0 42px;width:42px;height:42px;line-height:42px;text-align:center;background:var(--gold-p);border-radius:50%;font-size:21px}
 .mr b{display:block;font-size:17px;margin-bottom:2px}
 
+
+/* 撮影まわり */
+.vh{position:absolute!important;left:-9999px!important;width:1px!important;height:1px!important;opacity:0!important;overflow:hidden!important}
+.mini-guide{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin:14px 0 2px}
+.mini-guide span{background:#fffdf7;border:1px solid var(--line);border-radius:12px;text-align:center;font-size:12px;font-weight:700;color:var(--gold-d);padding:8px 4px;line-height:1.4}
+.status{margin-top:12px;text-align:center;font-size:13px;line-height:1.7;color:var(--soft);background:#fff;border:1px solid var(--line);border-radius:13px;padding:10px 12px}
+.status.ok{color:#4f6e4c;background:var(--green-p);border-color:rgba(111,165,107,.35);font-weight:700}
+.status.err{color:#9b4b33;background:#fff3ec;border-color:rgba(200,100,70,.35);font-weight:700}
+.btn-small{font-size:14px;padding:13px 16px;margin-top:10px}
+
 .foot{text-align:center;font-size:11px;color:var(--soft);margin-top:24px;line-height:1.7}
 #cvs{display:none}
 </style>
@@ -159,15 +169,23 @@ h1 .ac{color:var(--gold-d)}
 <section id="s-upload" class="scr">
   <div class="card">
     <p style="text-align:center;font-size:15px;margin-bottom:4px">明るい場所で、手のひら全体が<br>写るように撮影してください。</p>
+    <div class="mini-guide" aria-label="診断までの流れ">
+      <span>1<br>撮影</span><span>2<br>確認</span><span>3<br>診断</span>
+    </div>
     <div class="prev" id="prev">
       <div class="prev-ph"><span class="big">📷</span>ここに手のひらの写真が表示されます</div>
     </div>
-    <!-- capture不使用。iOS/Androidともにタップで「写真を撮る」が選べるOS標準シートが出る -->
-    <input type="file" id="fi" accept="image/*" style="display:none">
-    <label for="fi" class="btn btn-gold" style="text-align:center;margin-top:18px">📷 手のひらを撮影する</label>
-    <button class="btn btn-green" id="dbtn" onclick="startDiag()" disabled>この手のひらを診断する</button>
+
+    <!-- スマホ用：撮影と写真選択を分ける。LINE内ブラウザでも動きやすいように実ボタンから起動 -->
+    <input type="file" id="cameraFi" class="vh" accept="image/*" capture="environment">
+    <input type="file" id="albumFi"  class="vh" accept="image/*">
+    <button type="button" class="btn btn-gold"  id="cameraBtn" style="margin-top:18px">📷 その場で撮影する</button>
+    <button type="button" class="btn btn-ghost" id="albumBtn">写真から選ぶ</button>
+    <div class="status" id="status">まだ写真が選ばれていません</div>
+    <button type="button" class="btn btn-green" id="dbtn" onclick="startDiag()" disabled>この写真で診断する</button>
+    <button type="button" class="btn btn-ghost btn-small" onclick="resetPhoto()">撮り直す</button>
   </div>
-  <p class="foot">手のひらを画面いっぱいに、影が入らないように撮ると<br>きれいに読み取れます。</p>
+  <p class="foot">写真が表示されたら、下の診断ボタンを押すだけです。<br>写真は端末内だけで処理され、送信されません。</p>
 </section>
 
 <!-- ========== LOADING ========== -->
@@ -251,27 +269,76 @@ function go(id){
 
 /* ---- ファイル入力 ---- */
 let img = null;
-const fi   = document.getElementById('fi');
-const prev = document.getElementById('prev');
-const dbtn = document.getElementById('dbtn');
+let objectUrl = null;
+const cameraFi  = document.getElementById('cameraFi');
+const albumFi   = document.getElementById('albumFi');
+const cameraBtn = document.getElementById('cameraBtn');
+const albumBtn  = document.getElementById('albumBtn');
+const prev      = document.getElementById('prev');
+const dbtn      = document.getElementById('dbtn');
+const statusEl  = document.getElementById('status');
 
-fi.addEventListener('change', e=>{
+cameraBtn.addEventListener('click', ()=> cameraFi.click());
+albumBtn.addEventListener('click',  ()=> albumFi.click());
+cameraFi.addEventListener('change', handlePick);
+albumFi.addEventListener('change',  handlePick);
+
+function setStatus(text, type){
+  statusEl.textContent = text;
+  statusEl.className = 'status' + (type ? ' ' + type : '');
+}
+
+function handlePick(e){
   const file = e.target.files && e.target.files[0];
   if(!file) return;
-  const rd = new FileReader();
-  rd.onload = ev=>{
-    prev.innerHTML = `<img src="${ev.target.result}" alt="プレビュー">`;
-    img = new Image();
-    img.onload = ()=>{ dbtn.disabled=false; };
-    img.src = ev.target.result;
+  if(!file.type || !file.type.startsWith('image/')){
+    setStatus('画像ファイルを選んでください。', 'err');
+    return;
+  }
+
+  dbtn.disabled = true;
+  setStatus('写真を読み込んでいます…', '');
+
+  if(objectUrl) URL.revokeObjectURL(objectUrl);
+  objectUrl = URL.createObjectURL(file);
+
+  const nextImg = new Image();
+  nextImg.onload = ()=>{
+    img = nextImg;
+    prev.innerHTML = `<img src="${objectUrl}" alt="手のひらの写真プレビュー">`;
+    dbtn.disabled = false;
+    setStatus('写真が入りました。下の「この写真で診断する」を押してください。', 'ok');
+    dbtn.scrollIntoView({behavior:'smooth', block:'center'});
   };
-  rd.readAsDataURL(file);
-});
+  nextImg.onerror = ()=>{
+    img = null;
+    dbtn.disabled = true;
+    setStatus('写真を読み込めませんでした。もう一度撮影してください。', 'err');
+    if(objectUrl) URL.revokeObjectURL(objectUrl);
+    objectUrl = null;
+  };
+  nextImg.src = objectUrl;
+}
+
+function resetPhoto(){
+  img = null;
+  cameraFi.value = '';
+  albumFi.value = '';
+  dbtn.disabled = true;
+  if(objectUrl) URL.revokeObjectURL(objectUrl);
+  objectUrl = null;
+  prev.innerHTML = '<div class="prev-ph"><span class="big">📷</span>ここに手のひらの写真が表示されます</div>';
+  setStatus('まだ写真が選ばれていません', '');
+}
 
 /* ---- 診断開始 ---- */
 const MSGS = ['生命線を見ています…','知能線と金運線を見ています…','暮らしのタイプを整えています…'];
 function startDiag(){
-  if(!img) return;
+  if(!img){
+    setStatus('先に手のひらの写真を撮影してください。', 'err');
+    return;
+  }
+  dbtn.disabled = true;
   go('s-load');
   const el = document.getElementById('ldtxt');
   el.textContent = MSGS[0];
@@ -279,10 +346,17 @@ function startDiag(){
   const t = setInterval(()=>{ if(i<MSGS.length){ el.textContent=MSGS[i]; i++; } },1000);
   setTimeout(()=>{
     clearInterval(t);
-    const f = analyze(img);
-    showResult(f);
-    go('s-result');
-  }, 3000);
+    try{
+      const f = analyze(img);
+      showResult(f);
+      go('s-result');
+    }catch(err){
+      console.error(err);
+      go('s-upload');
+      dbtn.disabled = false;
+      setStatus('診断中に止まりました。写真を撮り直すか、写真から選んでください。', 'err');
+    }
+  }, 2200);
 }
 
 /* ---- 画像解析 ----
@@ -292,6 +366,7 @@ function startDiag(){
 function analyze(im){
   const cv = document.getElementById('cvs');
   const ctx = cv.getContext('2d',{willReadFrequently:true});
+  if(!ctx) throw new Error('Canvas is not supported');
   const W=160,H=160;
   cv.width=W; cv.height=H;
   ctx.drawImage(im,0,0,W,H);
@@ -586,8 +661,7 @@ function renderMemo(){
 
 /* ---- リセット ---- */
 function reset(){
-  img=null; fi.value=''; dbtn.disabled=true;
-  prev.innerHTML='<div class="prev-ph"><span class="big">📷</span>ここに手のひらの写真が表示されます</div>';
+  resetPhoto();
   go('s-top');
 }
 </script>
