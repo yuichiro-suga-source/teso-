@@ -141,6 +141,12 @@ h1 .ac{color:var(--gold-d)}
 .status.err{color:#9b4b33;background:#fff3ec;border-color:rgba(200,100,70,.35);font-weight:700}
 .btn-small{font-size:14px;padding:13px 16px;margin-top:10px}
 
+.cam-box{position:relative;margin-top:18px;border-radius:20px;overflow:hidden;background:#1b1b1b;min-height:360px;box-shadow:var(--sh2)}
+.cam-box video{width:100%;height:100%;min-height:360px;object-fit:cover;display:block;background:#111}
+.cam-guide{position:absolute;inset:18px;border:2px dashed rgba(255,255,255,.72);border-radius:22px;pointer-events:none}
+.cam-guide::before{content:'手のひらを枠に合わせてください';position:absolute;left:50%;bottom:14px;transform:translateX(-50%);white-space:nowrap;background:rgba(0,0,0,.45);color:#fff;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:700}
+.cam-note{font-size:13px;color:var(--soft);text-align:center;line-height:1.7;margin-top:12px}
+
 .foot{text-align:center;font-size:11px;color:var(--soft);margin-top:24px;line-height:1.7}
 #cvs{display:none}
 </style>
@@ -176,16 +182,31 @@ h1 .ac{color:var(--gold-d)}
       <div class="prev-ph"><span class="big">📷</span>ここに手のひらの写真が表示されます</div>
     </div>
 
-    <!-- スマホ用：撮影と写真選択を分ける。LINE内ブラウザでも動きやすいように実ボタンから起動 -->
-    <input type="file" id="cameraFi" class="vh" accept="image/*" capture="environment">
-    <input type="file" id="albumFi"  class="vh" accept="image/*">
-    <button type="button" class="btn btn-gold"  id="cameraBtn" style="margin-top:18px">📷 その場で撮影する</button>
-    <button type="button" class="btn btn-ghost" id="albumBtn">写真から選ぶ</button>
-    <div class="status" id="status">まだ写真が選ばれていません</div>
+    <button type="button" class="btn btn-gold" id="openCamBtn" style="margin-top:18px">📷 カメラを起動して撮影する</button>
+
+    <!-- 予備：LINE内ブラウザ等でカメラ許可が出ない場合のみ使用 -->
+    <input type="file" id="albumFi" class="vh" accept="image/*">
+    <button type="button" class="btn btn-ghost" id="albumBtn">カメラが開かない場合：写真から選ぶ</button>
+
+    <div class="status" id="status">まだ写真が撮影されていません</div>
     <button type="button" class="btn btn-green" id="dbtn" onclick="startDiag()" disabled>この写真で診断する</button>
     <button type="button" class="btn btn-ghost btn-small" onclick="resetPhoto()">撮り直す</button>
   </div>
   <p class="foot">写真が表示されたら、下の診断ボタンを押すだけです。<br>写真は端末内だけで処理され、送信されません。</p>
+</section>
+
+<!-- ========== CAMERA ========== -->
+<section id="s-camera" class="scr">
+  <div class="card">
+    <p style="text-align:center;font-size:15px;margin-bottom:4px">手のひらを枠の中に入れて、<br>下のボタンで撮影してください。</p>
+    <div class="cam-box">
+      <video id="camVideo" autoplay playsinline muted></video>
+      <div class="cam-guide"></div>
+    </div>
+    <div class="cam-note">カメラの許可が出たら「許可」を押してください。<br>うまく開かない場合は、前の画面から写真を選べます。</div>
+    <button type="button" class="btn btn-gold" id="shutterBtn">📸 この位置で撮影する</button>
+    <button type="button" class="btn btn-ghost" id="closeCamBtn">戻る</button>
+  </div>
 </section>
 
 <!-- ========== LOADING ========== -->
@@ -267,25 +288,89 @@ function go(id){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-/* ---- ファイル入力 ---- */
+/* ---- 撮影・写真入力 ---- */
 let img = null;
 let objectUrl = null;
-const cameraFi  = document.getElementById('cameraFi');
-const albumFi   = document.getElementById('albumFi');
-const cameraBtn = document.getElementById('cameraBtn');
-const albumBtn  = document.getElementById('albumBtn');
-const prev      = document.getElementById('prev');
-const dbtn      = document.getElementById('dbtn');
-const statusEl  = document.getElementById('status');
+let camStream = null;
 
-cameraBtn.addEventListener('click', ()=> cameraFi.click());
-albumBtn.addEventListener('click',  ()=> albumFi.click());
-cameraFi.addEventListener('change', handlePick);
-albumFi.addEventListener('change',  handlePick);
+const openCamBtn = document.getElementById('openCamBtn');
+const closeCamBtn = document.getElementById('closeCamBtn');
+const shutterBtn  = document.getElementById('shutterBtn');
+const albumFi     = document.getElementById('albumFi');
+const albumBtn    = document.getElementById('albumBtn');
+const camVideo    = document.getElementById('camVideo');
+const prev        = document.getElementById('prev');
+const dbtn        = document.getElementById('dbtn');
+const statusEl    = document.getElementById('status');
+
+openCamBtn.addEventListener('click', openCamera);
+closeCamBtn.addEventListener('click', ()=>{ stopCamera(); go('s-upload'); });
+shutterBtn.addEventListener('click', captureFromCamera);
+albumBtn.addEventListener('click', ()=> albumFi.click());
+albumFi.addEventListener('change', handlePick);
 
 function setStatus(text, type){
   statusEl.textContent = text;
   statusEl.className = 'status' + (type ? ' ' + type : '');
+}
+
+function stopCamera(){
+  if(camStream){
+    camStream.getTracks().forEach(track=>track.stop());
+    camStream = null;
+  }
+  if(camVideo) camVideo.srcObject = null;
+}
+
+async function openCamera(){
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    setStatus('このブラウザではカメラを直接起動できません。写真から選んでください。', 'err');
+    return;
+  }
+
+  try{
+    stopCamera();
+    go('s-camera');
+    shutterBtn.disabled = true;
+
+    camStream = await navigator.mediaDevices.getUserMedia({
+      audio:false,
+      video:{
+        facingMode:{ideal:'environment'},
+        width:{ideal:1280},
+        height:{ideal:960}
+      }
+    });
+
+    camVideo.srcObject = camStream;
+    await camVideo.play();
+    shutterBtn.disabled = false;
+  }catch(err){
+    console.error(err);
+    stopCamera();
+    go('s-upload');
+    setStatus('カメラが開けませんでした。LINE内ブラウザの場合は、右上メニューから外部ブラウザで開くか、写真から選んでください。', 'err');
+  }
+}
+
+function captureFromCamera(){
+  if(!camVideo || !camVideo.videoWidth){
+    setStatus('カメラ映像を読み込み中です。少し待ってからもう一度押してください。', 'err');
+    return;
+  }
+
+  const cv = document.getElementById('cvs');
+  const ctx = cv.getContext('2d');
+  const vw = camVideo.videoWidth;
+  const vh = camVideo.videoHeight;
+  cv.width = vw;
+  cv.height = vh;
+  ctx.drawImage(camVideo, 0, 0, vw, vh);
+
+  const dataUrl = cv.toDataURL('image/jpeg', 0.92);
+  setImageFromDataUrl(dataUrl, '撮影できました。下の「この写真で診断する」を押してください。');
+  stopCamera();
+  go('s-upload');
 }
 
 function handlePick(e){
@@ -296,39 +381,40 @@ function handlePick(e){
     return;
   }
 
-  dbtn.disabled = true;
-  setStatus('写真を読み込んでいます…', '');
-
   if(objectUrl) URL.revokeObjectURL(objectUrl);
   objectUrl = URL.createObjectURL(file);
+  setImageFromDataUrl(objectUrl, '写真が入りました。下の「この写真で診断する」を押してください。');
+}
+
+function setImageFromDataUrl(src, okText){
+  dbtn.disabled = true;
+  setStatus('写真を読み込んでいます…', '');
 
   const nextImg = new Image();
   nextImg.onload = ()=>{
     img = nextImg;
-    prev.innerHTML = `<img src="${objectUrl}" alt="手のひらの写真プレビュー">`;
+    prev.innerHTML = `<img src="${src}" alt="手のひらの写真プレビュー">`;
     dbtn.disabled = false;
-    setStatus('写真が入りました。下の「この写真で診断する」を押してください。', 'ok');
+    setStatus(okText, 'ok');
     dbtn.scrollIntoView({behavior:'smooth', block:'center'});
   };
   nextImg.onerror = ()=>{
     img = null;
     dbtn.disabled = true;
     setStatus('写真を読み込めませんでした。もう一度撮影してください。', 'err');
-    if(objectUrl) URL.revokeObjectURL(objectUrl);
-    objectUrl = null;
   };
-  nextImg.src = objectUrl;
+  nextImg.src = src;
 }
 
 function resetPhoto(){
   img = null;
-  cameraFi.value = '';
   albumFi.value = '';
   dbtn.disabled = true;
+  stopCamera();
   if(objectUrl) URL.revokeObjectURL(objectUrl);
   objectUrl = null;
   prev.innerHTML = '<div class="prev-ph"><span class="big">📷</span>ここに手のひらの写真が表示されます</div>';
-  setStatus('まだ写真が選ばれていません', '');
+  setStatus('まだ写真が撮影されていません', '');
 }
 
 /* ---- 診断開始 ---- */
